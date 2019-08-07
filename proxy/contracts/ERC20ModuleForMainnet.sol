@@ -25,6 +25,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 interface ILockAndDataERC20M {
     function ERC20Tokens(uint index) external returns (address);
     function ERC20Mapper(address contractERC20) external returns (uint);
+    function ERC20ApprovedTokens(address contractERC20) external returns (bool);
     function addERC20Token(address contractERC20) external returns (uint);
     function sendERC20(address contractHere, address to, uint amount) external returns (bool);
 }
@@ -42,6 +43,7 @@ contract ERC20ModuleForMainnet is Permissions {
 
     function receiveERC20(address contractHere, address to, uint amount, bool isRAW) public allow("DepositBox") returns (bytes memory data) {
         address lockAndDataERC20 = ContractManager(lockAndDataAddress).permitted(keccak256(abi.encodePacked("LockAndDataERC20")));
+        require(ILockAndDataERC20M(lockAndDataERC20).ERC20ApprovedTokens(contractHere), "This ERC20 token is not in the list of trusted");
         if (!isRAW) {
             uint contractPosition = ILockAndDataERC20M(lockAndDataERC20).ERC20Mapper(contractHere);
             if (contractPosition == 0) {

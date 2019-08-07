@@ -28,10 +28,12 @@ contract LockAndDataForMainnetERC20 is Permissions {
 
     event SendedERC20(bool result);
     event AddedERC20Token(uint index);
+    event ERC20ApprovedAddressAdded(address approvedTokenAddress);
 
 
     mapping(uint => address) public ERC20Tokens;
     mapping(address => uint) public ERC20Mapper;
+    mapping(address => bool) public ERC20ApprovedTokens;
     uint newIndexERC20 = 1;
 
     constructor(address lockAndDataAddress) Permissions(lockAndDataAddress) public {
@@ -53,4 +55,10 @@ contract LockAndDataForMainnetERC20 is Permissions {
         emit AddedERC20Token(uint(index));
         return index;
     }
+
+    function addERC20ApprovedToken(address approvedTokenAddress) public onlyOwner {
+        ERC20ApprovedTokens[approvedTokenAddress] = true;
+        emit ERC20ApprovedAddressAdded(approvedTokenAddress);
+    }
+
 }

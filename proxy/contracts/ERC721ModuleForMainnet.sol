@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC721/IERC721Full.sol";
 interface ILockAndDataERC721M {
     function ERC721Tokens(uint index) external returns (address);
     function ERC721Mapper(address contractERC721) external returns (uint);
+    function ERC721ApprovedTokens(address contractERC721) external returns (bool);
     function addERC721Token(address contractERC721) external returns (uint);
     function sendERC721(address contractHere, address to, uint token) external returns (bool);
 }
@@ -22,6 +23,7 @@ contract ERC721ModuleForMainnet is Permissions {
 
     function receiveERC721(address contractHere, address to, uint tokenId, bool isRAW) public allow("DepositBox") returns (bytes memory data) {
         address lockAndDataERC721 = ContractManager(lockAndDataAddress).permitted(keccak256(abi.encodePacked("LockAndDataERC721")));
+        require(ILockAndDataERC721M(lockAndDataERC721).ERC721ApprovedTokens(contractHere), "This ERC721 token is not in the list of trusted");
         if (!isRAW) {
             uint contractPosition = ILockAndDataERC721M(lockAndDataERC721).ERC721Mapper(contractHere);
             if (contractPosition == 0) {
