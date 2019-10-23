@@ -9,7 +9,7 @@ class ALotOfTransactionsSendEtherToSchain(TestCase):
 
     def _execute(self):
         #
-        range_int = 5
+        range_int = 2
         #
         address = self.blockchain.key_to_address(self.config.schain_key)
         balance = self.blockchain.get_balance_on_schain(address)
@@ -18,11 +18,12 @@ class ALotOfTransactionsSendEtherToSchain(TestCase):
         amount = 2 * 10 ** 15
         #
         for x in range(range_int):
+            # time.sleep(1)
             self.agent.transfer_eth_from_mainnet_to_schain(self.config.mainnet_key,
                                                            self.config.schain_key,
                                                            amount,
                                                            self.timeout)
-            a = 23
+            # time.sleep(1)
         #
         balance = self.blockchain.get_balance_on_schain(address)
         if balance == initial_balance + range_int * amount:

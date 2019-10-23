@@ -91,7 +91,7 @@ class Agent:
                 else:
                     sleep(1)
 
-    def transfer_erc20_from_mainnet_to_schain(self, token_contract, from_key, to_key, amount, timeout=0):
+    def transfer_erc20_from_mainnet_to_schain(self, token_contract, from_key, to_key, amount, index, timeout=0):
         config_json = {'token_address': token_contract.address, 'token_abi': token_contract.abi}
         erc20_config_filename = self.config.test_working_dir + '/erc20.json'
         self._create_path(erc20_config_filename)
@@ -107,7 +107,7 @@ class Agent:
         start = time()
         while time() < start + timeout if timeout > 0 else True:
             try:
-                self.blockchain.get_erc20_on_schain(1)
+                self.blockchain.get_erc20_on_schain(index)
                 return
             except ValueError:
                 debug('Wait for erc20 deployment')
