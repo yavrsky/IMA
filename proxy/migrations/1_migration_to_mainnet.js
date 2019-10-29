@@ -21,6 +21,7 @@ let contractManagerAddress = (process.env.CONTRACT_MANAGER_ADDRESS == "" || proc
 
 async function deploy(deployer, network) {
 
+    console.log("Contract Manager Address: ", contractManagerAddress);
     await deployer.deploy(MessageProxy, "Mainnet", contractManagerAddress, {gas: gasLimit}).then(async function() {
         return await deployer.deploy(LockAndDataForMainnet, {gas: gasLimit});
     }).then(async function(inst) {
