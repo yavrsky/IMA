@@ -98,6 +98,9 @@ class Agent:
         with open(erc20_config_filename, 'w') as erc20_file:
             json.dump(config_json, erc20_file)
 
+        schain_address = self.blockchain.key_to_address(to_key)
+        tx_count = self.blockchain.get_transactions_count_on_schain(schain_address)
+
         self._execute_command('m2s-payment', {'no-raw-transfer': None,
                                               'amount': amount,
                                               'key-main-net': from_key,
@@ -105,13 +108,9 @@ class Agent:
                                               'erc20-main-net': erc20_config_filename})
 
         start = time()
-        while time() < start + timeout if timeout > 0 else True:
-            try:
-                self.blockchain.get_erc20_on_schain(index)
-                return
-            except ValueError:
-                debug('Wait for erc20 deployment')
-                sleep(1)
+        while (time() < start + timeout if timeout > 0 else True) and \
+                self.blockchain.get_transactions_count_on_schain(schain_address) == tx_count:
+            sleep(1)
 
     def transfer_erc721_from_mainnet_to_schain(self, token_contract, from_key, to_key, token_id, timeout=0):
         config_json = {'token_address': token_contract.address, 'token_abi': token_contract.abi}
@@ -119,7 +118,9 @@ class Agent:
         self._create_path(erc721_config_filename)
         with open(erc721_config_filename, 'w') as erc721_file:
             json.dump(config_json, erc721_file)
-        sleep(5)
+
+        schain_address = self.blockchain.key_to_address(to_key)
+        tx_count = self.blockchain.get_transactions_count_on_schain(schain_address)
 
         self._execute_command('m2s-payment', {'no-raw-transfer': None,
                                               'tid': token_id,
@@ -128,13 +129,9 @@ class Agent:
                                               'erc721-main-net': erc721_config_filename})
 
         start = time()
-        while time() < start + timeout if timeout > 0 else True:
-            try:
-                self.blockchain.get_erc721_on_schain(token_id)
-                return
-            except ValueError:
-                debug('Wait for erc721 deployment')
-                sleep(1)
+        while (time() < start + timeout if timeout > 0 else True) and \
+                self.blockchain.get_transactions_count_on_schain(schain_address) == tx_count:
+            sleep(1)
 
     def transfer_erc20_from_schain_to_mainnet(self, token_contract, from_key, to_key, amount, index, timeout=0):
         config_json = {'token_address': token_contract.address, 'token_abi': token_contract.abi}
@@ -179,18 +176,13 @@ class Agent:
         # destination_address = erc721.functions.ownerOf(token_id).call()
         destination_address = self.blockchain.key_to_address(to_key)
         tx_count = self.blockchain.get_transactions_count_on_mainnet(destination_address)
-        sleep(10)
+
         self._execute_command('s2m-payment', {'no-raw-transfer': None,
                                               'tid': token_id,
                                               'key-main-net': to_key,
                                               'key-s-chain': from_key,
                                               'erc721-s-chain': erc721_clone_config_filename})
 
-        # start = time()
-        # while (time() < start + timeout if timeout > 0 else True) and \
-        #         destination_address == erc721.functions.ownerOf(token_id).call():
-        #     debug('Wait for erc721 payment')
-        #     sleep(1)
         start = time()
         while (time() < start + timeout if timeout > 0 else True) and \
                 self.blockchain.get_transactions_count_on_mainnet(destination_address) == tx_count:

@@ -1102,11 +1102,19 @@ if ( g_str_url_s_chain.length == 0 ) {
     process.exit( 501 );
 }
 
-const g_w3http_main_net = new w3mod.providers.HttpProvider( g_str_url_main_net );
+const g_w3http_main_net = get_web3_provider( g_str_url_main_net );
 const g_w3_main_net = new w3mod( g_w3http_main_net );
 
-const g_w3http_s_chain = new w3mod.providers.HttpProvider( g_str_url_s_chain );
+const g_w3http_s_chain = get_web3_provider( g_str_url_s_chain );
 const g_w3_s_chain = new w3mod( g_w3http_s_chain );
+
+function get_web3_provider(url_string) {
+    if ( url_string.includes("ws:") || url_string.includes("wss:") ) {
+        return new w3mod.providers.WebsocketProvider( url_string )
+    } else if ( url_string.includes("http:") || url_string.includes("https:") ) {
+        return new w3mod.providers.HttpProvider( url_string )
+    }
+}
 
 let g_jo_deposit_box = new g_w3_main_net.eth.Contract( joTrufflePublishResult_main_net.deposit_box_abi, joTrufflePublishResult_main_net.deposit_box_address ); // only main net
 let g_jo_token_manager = new g_w3_s_chain.eth.Contract( joTrufflePublishResult_s_chain.token_manager_abi, joTrufflePublishResult_s_chain.token_manager_address ); // only s-chain

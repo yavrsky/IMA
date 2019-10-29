@@ -1,4 +1,5 @@
 from web3 import Web3, HTTPProvider
+from web3 import Web3, WebsocketProvider
 import json
 from eth_account import Account
 import time
@@ -11,8 +12,8 @@ class BlockChain:
 
     def __init__(self, config):
         self.config = config
-        self.web3_mainnet = Web3(HTTPProvider(self.config.mainnet_rpc_url))
-        self.web3_schain = Web3(HTTPProvider(self.config.schain_rpc_url))
+        self.web3_mainnet = self.get_web3_provider(self.config.mainnet_rpc_url)
+        self.web3_schain = self.get_web3_provider(self.config.schain_rpc_url)
         if not self.config.user_key:
             self.config.user_key = Account.create().privateKey.hex()[2:]
 
@@ -26,6 +27,13 @@ class BlockChain:
     @staticmethod
     def key_to_address(key):
         return Account.privateKeyToAccount(key).address
+
+    @staticmethod
+    def get_web3_provider(url_string):
+        if ("ws:" in url_string) or ("wss:" in url_string):
+            return Web3(WebsocketProvider(url_string))
+        elif ("http:" in url_string) or ("https:" in url_string):
+            return Web3(HTTPProvider(url_string))
 
     def wei_to_bigger(self, amount):
         units = {'wei': 1,
@@ -61,7 +69,9 @@ class BlockChain:
                 data = add_eth_cost_encode_abi
             ),
             from_key)
-        self.web3_schain.eth.sendRawTransaction(signed_txn.rawTransaction)
+        transaction_hash = self.web3_schain.eth.sendRawTransaction(signed_txn.rawTransaction)
+        #
+        receipt = BlockChain.await_receipt(self.web3_schain, transaction_hash)
 
     def send_ether_on_mainnet(self, from_key, to_key, amount_wei):
         sender_address = self.key_to_address(from_key)
@@ -75,7 +85,9 @@ class BlockChain:
             ),
             from_key)
 
-        self.web3_mainnet.eth.sendRawTransaction(signed_txn.rawTransaction)
+        transaction_hash = self.web3_mainnet.eth.sendRawTransaction(signed_txn.rawTransaction)
+        #
+        receipt = BlockChain.await_receipt(self.web3_mainnet, transaction_hash)
 
     def deploy_erc20_on_mainnet(self, private_key, name, symbol, decimals):
         return self._deploy_contract_to_mainnet(self.config.test_root + '/resources/ERC20MintableDetailed.json',
@@ -89,11 +101,21 @@ class BlockChain:
     def get_transactions_count_on_mainnet(self, address):
         return self.web3_mainnet.eth.getTransactionCount(address)
 
+    def get_transactions_count_on_schain(self, address):
+        return self.web3_schain.eth.getTransactionCount(address)
+
     def get_erc20_on_schain(self, index):
         lock_erc20 = self._get_contract_on_schain('lock_and_data_for_schain_erc20')
         erc20_address = lock_erc20.functions.ERC20Tokens(index).call()
-        if erc20_address == '0x0000000000000000000000000000000000000000':
-            raise ValueError('No such token')
+        # if erc20_address == '0x0000000000000000000000000000000000000000':
+        #     raise ValueError('No such token')
+        i = 0
+        while erc20_address == '0x0000000000000000000000000000000000000000':
+            i += 1
+            erc20_address = erc20_address.functions.ERC20Tokens(index).call()
+            time.sleep(1)
+            if i == 30:
+                raise ValueError('No such token')
         with open(self.config.proxy_root + '/build/contracts/ERC20OnChain.json') as erc20_on_chain_file:
             erc20_on_chain_json = json.load(erc20_on_chain_file)
             return self.web3_schain.eth.contract(address=erc20_address, abi=erc20_on_chain_json['abi'])
@@ -101,8 +123,16 @@ class BlockChain:
     def get_erc721_on_schain(self, index):
         lock_erc721 = self._get_contract_on_schain('lock_and_data_for_schain_erc721')
         erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
-        if erc721_address == '0x0000000000000000000000000000000000000000':
-            raise ValueError('No such token')
+        # if erc721_address == '0x0000000000000000000000000000000000000000':
+        #     raise ValueError('No such token')
+        i = 0
+        while erc721_address == '0x0000000000000000000000000000000000000000':
+            i += 1
+            erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
+            time.sleep(1)
+            if i == 30:
+                raise ValueError('No such token')
+
         with open(self.config.proxy_root + '/build/contracts/ERC721OnChain.json') as erc721_on_chain_file:
             erc721_on_chain_json = json.load(erc721_on_chain_file)
             return self.web3_schain.eth.contract(address=erc721_address, abi=erc721_on_chain_json['abi'])
@@ -110,8 +140,15 @@ class BlockChain:
     def get_erc20_on_mainnet(self, index):
         lock_erc20 = self._get_contract_on_mainnet('lock_and_data_for_mainnet_erc20')
         erc20_address = lock_erc20.functions.ERC20Tokens(index).call()
-        if erc20_address == '0x0000000000000000000000000000000000000000':
-            raise ValueError('No such token')
+        # if erc20_address == '0x0000000000000000000000000000000000000000':
+        #     raise ValueError('No such token')
+        i = 0
+        while erc20_address == '0x0000000000000000000000000000000000000000':
+            i += 1
+            erc20_address = erc20_address.functions.ERC20Tokens(index).call()
+            time.sleep(1)
+            if i == 30:
+                raise ValueError('No such token')
         with open(self.config.test_resource_dir + '/ERC20MintableDetailed.json') as erc20_file:
             erc20_on_mainnet_json = json.load(erc20_file)
             return self.web3_schain.eth.contract(address=erc20_address, abi=erc20_on_mainnet_json['abi'])
@@ -119,8 +156,15 @@ class BlockChain:
     def get_erc721_on_mainnet(self, index):
         lock_erc721 = self._get_contract_on_mainnet('lock_and_data_for_mainnet_erc721')
         erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
-        if erc721_address == '0x0000000000000000000000000000000000000000':
-            raise ValueError('No such token')
+        # if erc721_address == '0x0000000000000000000000000000000000000000':
+        #     raise ValueError('No such token')
+        i = 0
+        while erc721_address == '0x0000000000000000000000000000000000000000':
+            i += 1
+            erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
+            time.sleep(1)
+            if i == 30:
+                raise ValueError('No such token')
         with open(self.config.test_resource_dir + '/ERC721FullMetadataMintable.json') as erc721_file:
             erc721_on_mainnet_json = json.load(erc721_file)
             return self.web3_schain.eth.contract(address=erc721_address, abi=erc721_on_mainnet_json['abi'])
