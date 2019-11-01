@@ -21,6 +21,9 @@ add `config.json` to `test` folder (see `config.example.json`)
 !!! both of your accounts (on `mainnet` and `schain`) should have ETH
 for contracts deploy on mainnet and schain respectively.
 
+!!! when you run `load_...` tests you need increase or decrease
+`range_int` parameter inside this tests
+
 ##### run tests
 
 single run test from `test` folder
