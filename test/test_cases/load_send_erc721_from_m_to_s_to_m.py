@@ -16,7 +16,7 @@ class LoadSendERC721ToMainnetViaSchain(TestCase):
 
     def _execute(self):
         #
-        range_int = 5
+        range_int = 400
         # deploy token
         self.erc721 = self.blockchain.deploy_erc721_on_mainnet(self.config.mainnet_key, 'elv721', 'ELV')
         # mint

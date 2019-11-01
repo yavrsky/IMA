@@ -106,13 +106,13 @@ class BlockChain:
 
     def get_erc20_on_schain(self, index):
         lock_erc20 = self._get_contract_on_schain('lock_and_data_for_schain_erc20')
-        erc20_address = lock_erc20.functions.ERC20Tokens(index).call()
+        erc20_address = lock_erc20.functions.erc20Tokens(index).call()
         # if erc20_address == '0x0000000000000000000000000000000000000000':
         #     raise ValueError('No such token')
         i = 0
         while erc20_address == '0x0000000000000000000000000000000000000000':
             i += 1
-            erc20_address = erc20_address.functions.ERC20Tokens(index).call()
+            erc20_address = erc20_address.functions.erc20Tokens(index).call()
             time.sleep(1)
             if i == 30:
                 raise ValueError('No such token')
@@ -122,13 +122,13 @@ class BlockChain:
 
     def get_erc721_on_schain(self, index):
         lock_erc721 = self._get_contract_on_schain('lock_and_data_for_schain_erc721')
-        erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
+        erc721_address = lock_erc721.functions.erc721Tokens(index).call()
         # if erc721_address == '0x0000000000000000000000000000000000000000':
         #     raise ValueError('No such token')
         i = 0
         while erc721_address == '0x0000000000000000000000000000000000000000':
             i += 1
-            erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
+            erc721_address = lock_erc721.functions.erc721Tokens(index).call()
             time.sleep(1)
             if i == 30:
                 raise ValueError('No such token')
@@ -139,13 +139,13 @@ class BlockChain:
 
     def get_erc20_on_mainnet(self, index):
         lock_erc20 = self._get_contract_on_mainnet('lock_and_data_for_mainnet_erc20')
-        erc20_address = lock_erc20.functions.ERC20Tokens(index).call()
+        erc20_address = lock_erc20.functions.erc20Tokens(index).call()
         # if erc20_address == '0x0000000000000000000000000000000000000000':
         #     raise ValueError('No such token')
         i = 0
         while erc20_address == '0x0000000000000000000000000000000000000000':
             i += 1
-            erc20_address = erc20_address.functions.ERC20Tokens(index).call()
+            erc20_address = erc20_address.functions.erc20Tokens(index).call()
             time.sleep(1)
             if i == 30:
                 raise ValueError('No such token')
@@ -155,13 +155,13 @@ class BlockChain:
 
     def get_erc721_on_mainnet(self, index):
         lock_erc721 = self._get_contract_on_mainnet('lock_and_data_for_mainnet_erc721')
-        erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
+        erc721_address = lock_erc721.functions.erc721Tokens(index).call()
         # if erc721_address == '0x0000000000000000000000000000000000000000':
         #     raise ValueError('No such token')
         i = 0
         while erc721_address == '0x0000000000000000000000000000000000000000':
             i += 1
-            erc721_address = lock_erc721.functions.ERC721Tokens(index).call()
+            erc721_address = lock_erc721.functions.erc721Tokens(index).call()
             time.sleep(1)
             if i == 30:
                 raise ValueError('No such token')
