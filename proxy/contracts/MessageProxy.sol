@@ -304,6 +304,17 @@ contract MessageProxy {
         connectedChains[keccak256(abi.encodePacked(srcChainID))].incomingMessageCounter += uint(messages.length);
     }
 
+    function moveIncomingCounter(string calldata schainName) external {
+        require(msg.sender == owner, "Sender is not an owner");
+        connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter++;
+    }
+
+    function setCountersToZero(string calldata schainName) external {
+        require(msg.sender == owner, "Sender is not an owner");
+        connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter = 0;
+        connectedChains[keccak256(abi.encodePacked(schainName))].outgoingMessageCounter = 0;
+    }
+
     function verifyMessageSignature(
         uint[2] memory blsSignature,
         bytes32 hash,
@@ -320,16 +331,14 @@ contract MessageProxy {
             keccak256(abi.encodePacked("SkaleVerifier"))
         );
         return ISkaleVerifier(skaleVerifierAddress).verifySchainSignature(
-                blsSignature[0],
-                blsSignature[1],
-                hash,
-                counter,
-                hashA,
-                hashB,
-                srcChainID
-            );
-        //     "Could not verify signature"
-        // );
+            blsSignature[0],
+            blsSignature[1],
+            hash,
+            counter,
+            hashA,
+            hashB,
+            srcChainID
+        );
     }
 
     function hashedArray(Message[] memory messages) internal pure returns (bytes32) {
