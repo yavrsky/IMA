@@ -73,8 +73,6 @@ contract MessageProxy {
     // Owner of this chain. For mainnet, the owner is SkaleManager
     address public owner;
 
-    address public contractManagerSkaleManager;
-
     mapping(address => bool) public authorizedCaller;
 
     event OutgoingMessage(
@@ -110,7 +108,7 @@ contract MessageProxy {
 
     /// Create a new message proxy
 
-    constructor(string memory newChainID, address newContractManager) public {
+    constructor(string memory newChainID, address contractManager) public {
         owner = msg.sender;
         authorizedCaller[msg.sender] = true;
         chainID = newChainID;
@@ -131,8 +129,6 @@ contract MessageProxy {
                 0,
                 0,
                 true);
-        } else {
-            contractManagerSkaleManager = newContractManager;
         }
     }
 
@@ -280,16 +276,6 @@ contract MessageProxy {
                 input[i].amount = messages[i].amount;
                 input[i].data = messages[i].data;
             }
-            require(
-                verifyMessageSignature(
-                    blsSignature,
-                    hashedArray(input),
-                    counter,
-                    hashA,
-                    hashB,
-                    srcChainID
-                ), "Signature is not verified"
-            );
         }
 
         for (uint i = 0; i < messages.length; i++) {
@@ -313,46 +299,5 @@ contract MessageProxy {
         require(msg.sender == owner, "Sender is not an owner");
         connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter = 0;
         connectedChains[keccak256(abi.encodePacked(schainName))].outgoingMessageCounter = 0;
-    }
-
-    function verifyMessageSignature(
-        uint[2] memory blsSignature,
-        bytes32 hash,
-        uint counter,
-        uint hashA,
-        uint hashB,
-        string memory srcChainID
-    )
-        internal
-        view
-        returns (bool)
-    {
-        address skaleVerifierAddress = IContractManagerSkaleManager(contractManagerSkaleManager).contracts(
-            keccak256(abi.encodePacked("SkaleVerifier"))
-        );
-        return ISkaleVerifier(skaleVerifierAddress).verifySchainSignature(
-            blsSignature[0],
-            blsSignature[1],
-            hash,
-            counter,
-            hashA,
-            hashB,
-            srcChainID
-        );
-    }
-
-    function hashedArray(Message[] memory messages) internal pure returns (bytes32) {
-        bytes memory data;
-        for (uint i = 0; i < messages.length; i++) {
-            data = abi.encodePacked(
-                data,
-                bytes32(bytes20(messages[i].sender)),
-                bytes32(bytes20(messages[i].destinationContract)),
-                bytes32(bytes20(messages[i].to)),
-                messages[i].amount,
-                messages[i].data
-            );
-        }
-        return keccak256(data);
     }
 }
