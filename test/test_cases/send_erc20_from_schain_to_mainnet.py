@@ -3,6 +3,9 @@ from logging import debug, error
 
 from tools.test_case import TestCase
 from tools.test_pool import test_pool
+from tools.utils import set_ima_to_schain_nodes
+from tools.utils import restart_skaled
+import time
 
 
 class SendERC20ToMainnet(TestCase):
@@ -16,9 +19,11 @@ class SendERC20ToMainnet(TestCase):
         super().__init__('Send ERC20 from schain to mainnet', config)
 
     def _prepare(self):
-
+        set_ima_to_schain_nodes(self.config.schain_name, self.config.mainnet_rpc_url)
+        time.sleep(2)
+        restart_skaled(self.config.schain_name)
+        time.sleep(2)
         # deploy token
-
         self.erc20 = self.blockchain.deploy_erc20_on_mainnet(self.config.mainnet_key, 'D2-Token', 'D2', 100)
 
         # mint
