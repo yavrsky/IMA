@@ -1,9 +1,16 @@
 {
   "NETWORK_FOR_MAINNET": "mainnet",
   "ETH_PRIVATE_KEY_FOR_MAINNET": "{private_key}",
+  "MNEMONIC_FOR_MAINNET": "{private_key}",
+  "PRIVATE_KEY_FOR_MAINNET": "{private_key}",
+  "ACCOUNT_FOR_MAINNET": "{private_address}",
   "MAINNET_RPC_URL": "http://<MAINNET_IP_ADDRESS>",
+
   "NETWORK_FOR_SCHAIN": "schain",
   "ETH_PRIVATE_KEY_FOR_SCHAIN": "{private_key}",
+  "MNEMONIC_FOR_SCHAIN": "{private_key}",
+  "PRIVATE_KEY_FOR_SCHAIN": "{private_key}",
+  "ACCOUNT_FOR_SCHAIN": "{private_address}",
   "SCHAIN_RPC_URL": "http://<SCHAIN_IP_ADDRESS>",
-  "SCHAIN_NAME": "SKALE"
+  "SCHAIN_NAME": "SOME_NAME"
 }
