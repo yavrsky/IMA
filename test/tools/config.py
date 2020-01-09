@@ -5,6 +5,7 @@ class Config:
     proxy_root = 'proxy'
     test_root = 'test'
     test_working_dir = 'working'
+    test_sign_messages_dir = 'sign_messages'
     test_resource_dir = 'resources'
     network_for_mainnet = 'mainnet'
     network_for_schain = 'schain'
@@ -27,6 +28,7 @@ class Config:
         self.test_root = src_root + '/' + self.test_root
         self.test_working_dir = self.test_root + '/' + self.test_working_dir
         self.test_resource_dir = self.test_root + '/' + self.test_resource_dir
+        self.test_sign_messages_dir = self.test_root + '/' + self.test_sign_messages_dir
 
         # mainnet
         if 'NETWORK_FOR_MAINNET' in config_json:

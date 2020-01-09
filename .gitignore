@@ -64,3 +64,4 @@ proxy/data/*.json
 
 test/working
 test/config.json
+test/sign_messages
