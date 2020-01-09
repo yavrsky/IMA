@@ -56,7 +56,7 @@ def set_ima_to_schain_nodes(schain_name, mainnet_url):
         # add data to wallets field
         # data_schain['skaleConfig']['nodeInfo']['imaMainNet'] = mainnet_url
         data_schain['skaleConfig']['nodeInfo']['imaMessageProxySChain'] = ima_chain_addr
-        data_schain['skaleConfig']['nodeInfo']['imaMessageProxyMainNet'] = ima_mainnet_addr
+        # data_schain['skaleConfig']['nodeInfo']['imaMessageProxyMainNet'] = ima_mainnet_addr
         # write dictionary to .json file
         with open(path_to_schain, 'w') as json_file:
             json.dump(data_schain, json_file, indent=4)
@@ -103,6 +103,6 @@ def restart_skaled(schain_name):
     for host, host_output in output.items():
         for line in host_output.stdout:
             print(line)
-    print('waiting %s ' % '60 seconds')
-    time.sleep(60)
+    print('waiting %s ' % '120 seconds')
+    time.sleep(120)
     print('waiting %s ' % 'is over')

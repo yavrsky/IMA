@@ -106,10 +106,10 @@ class Agent:
                                               'key-main-net': from_key,
                                               'key-s-chain': to_key,
                                               'erc20-main-net': erc20_config_filename,
-                                              # 'sign-messages': None,
-                                              # 'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
-                                              # 'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
-                                              # 'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
+                                              'sign-messages': None,
+                                              'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
+                                              'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
+                                              'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
                                               })
 
         start = time()
@@ -157,10 +157,10 @@ class Agent:
                                               'key-main-net': to_key,
                                               'key-s-chain': from_key,
                                               'erc20-s-chain': erc20_clone_config_filename,
-                                              # 'sign-messages': None,
-                                              # 'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
-                                              # 'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
-                                              # 'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
+                                              'sign-messages': None,
+                                              'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
+                                              'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
+                                              'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
                                               })
         # sleep(30)
 
