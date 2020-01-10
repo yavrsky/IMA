@@ -68,6 +68,7 @@ class SendERC20ToMainnet(TestCase):
         balance = self.erc20.functions.balanceOf(destination_address).call()
 
         self.agent.transfer_erc20_from_schain_to_mainnet(self.erc20_clone, # token
+                                                         self.erc20,  # token_main
                                                          self.config.schain_key, # from
                                                          self.config.mainnet_key, # to
                                                          (self.amount - 2), # 2 tokens

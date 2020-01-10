@@ -23,7 +23,7 @@ class TestCase:
 
 
     def prepare(self):
-        # self.deployer.deploy()
+        self.deployer.deploy()
         self.deployer.deploy_schain()
         self.agent.register()
         self.agent.start()

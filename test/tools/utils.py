@@ -8,6 +8,8 @@ from os import system
 import time
 import subprocess
 import json
+import paramiko
+import socket
 
 
 
@@ -39,7 +41,7 @@ def get_receipt(web3, tx):
 
 def set_ima_to_schain_nodes(schain_name, mainnet_url):
     ips = get_nodes_ips_from_file(schain_name)
-    ima_mainnet_addr, ima_chain_addr = get_ima_addrs_for_mainnet_and_schain()
+    ima_mainnet_addr, ima_chain_addr = get_ima_addrs_for_mainnet_and_schain(schain_name)
     index = 0
     # overwrite config_schain.json loop on nodes
     for ip in ips:
@@ -78,10 +80,10 @@ def get_nodes_ips_from_file(schain_name):
     return data['ips']
 
 
-def get_ima_addrs_for_mainnet_and_schain():
+def get_ima_addrs_for_mainnet_and_schain(schain_name):
     #
     ima_mainnet = os.path.join(proj_dir, 'proxy/data/proxyMainnet.json')
-    ima_schain = os.path.join(proj_dir, 'proxy/data/proxySchain.json')
+    ima_schain = os.path.join(proj_dir, f'proxy/data/proxySchain_{schain_name}.json')
     # create dictionary from .json file
     with open(f'{ima_mainnet}', 'r') as f:
         ima_mainnet_dict = json.load(f)
@@ -96,13 +98,36 @@ def get_ima_addrs_for_mainnet_and_schain():
 
 
 def restart_skaled(schain_name):
+    restart_skaled_paramiko(schain_name)
+    # print('inside in `restart_skaled`')
+    # ips = get_nodes_ips_from_file(schain_name)
+    # client = ParallelSSHClient(ips, user='root', port=22)
+    # output = client.run_command(f'docker rm -f skale_schain_{schain_name}')
+    # for host, host_output in output.items():
+    #     for line in host_output.stdout:
+    #         print(line)
+    # print('waiting %s ' % '120 seconds')
+    # time.sleep(120)
+    # print('waiting %s ' % 'is over')
+
+
+def restart_skaled_paramiko(schain_name):
     print('inside in `restart_skaled`')
     ips = get_nodes_ips_from_file(schain_name)
-    client = ParallelSSHClient(ips, user='root', port=22)
-    output = client.run_command(f'docker rm -f skale_schain_{schain_name}')
-    for host, host_output in output.items():
-        for line in host_output.stdout:
-            print(line)
-    print('waiting %s ' % '120 seconds')
-    time.sleep(120)
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    for ip in ips:
+        try:
+            ssh.connect(ip, username='root', port=22, timeout=10)
+            ssh.exec_command(f'docker rm -f skale_schain_{schain_name}')
+            ssh.close()
+        except socket.timeout:
+            print("socket.timeout")
+        except TimeoutError:
+            print("TimeoutError")
+        except paramiko.SSHException:
+            print("Connection Error")
+    #
+    print('waiting %s ' % '180 seconds')
+    time.sleep(180)
     print('waiting %s ' % 'is over')

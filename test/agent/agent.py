@@ -106,10 +106,10 @@ class Agent:
                                               'key-main-net': from_key,
                                               'key-s-chain': to_key,
                                               'erc20-main-net': erc20_config_filename,
-                                              'sign-messages': None,
-                                              'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
-                                              'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
-                                              'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
+                                              # 'sign-messages': None,
+                                              # 'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
+                                              # 'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
+                                              # 'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
                                               })
 
         start = time()
@@ -138,12 +138,18 @@ class Agent:
                 self.blockchain.get_transactions_count_on_schain(schain_address) == tx_count:
             sleep(1)
 
-    def transfer_erc20_from_schain_to_mainnet(self, token_contract, from_key, to_key, amount, index, timeout=0):
+    def transfer_erc20_from_schain_to_mainnet(self, token_contract, token_contract_main, from_key, to_key, amount, index, timeout=0):
         config_json = {'token_address': token_contract.address, 'token_abi': token_contract.abi}
         erc20_clone_config_filename = self.config.test_working_dir + '/erc20_clone.json'
         self._create_path(erc20_clone_config_filename)
         with open(erc20_clone_config_filename, 'w') as erc20_file:
             json.dump(config_json, erc20_file)
+        #
+        config_json_erc20_main = {'token_address': token_contract_main.address, 'token_abi': token_contract_main.abi}
+        erc20_config_filename = self.config.test_working_dir + '/erc20.json'
+        self._create_path(erc20_config_filename)
+        with open(erc20_config_filename, 'w') as erc20_file:
+            json.dump(config_json_erc20_main, erc20_file)
 
         destination_address = self.blockchain.key_to_address(to_key)
         # erc20 = self.blockchain.get_erc20_on_mainnet(index)
@@ -157,10 +163,11 @@ class Agent:
                                               'key-main-net': to_key,
                                               'key-s-chain': from_key,
                                               'erc20-s-chain': erc20_clone_config_filename,
-                                              'sign-messages': None,
-                                              'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
-                                              'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
-                                              'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
+                                              'erc20-main-net': erc20_config_filename,
+                                              # 'sign-messages': None,
+                                              # 'bls-glue': self.config.test_sign_messages_dir + '/bls_glue',
+                                              # 'hash-g1': self.config.test_sign_messages_dir + '/hash_g1',
+                                              # 'bls-verify': self.config.test_sign_messages_dir + '/verify_bls',
                                               })
         # sleep(30)
 
@@ -230,7 +237,9 @@ class Agent:
             'abi-main-net': self.config.abi_mainnet,
             'abi-s-chain': self.config.abi_schain,
             'key-main-net': self.config.mainnet_key,
-            'key-s-chain': self.config.schain_key
+            'key-s-chain': self.config.schain_key,
+            'cid-main-net': -4,
+            'cid-s-chain': -4
         }
 
     def _wei_to_bigger(self, amount):
