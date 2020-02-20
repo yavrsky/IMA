@@ -9,54 +9,37 @@ import {
     LockAndDataForMainnetERC20Contract,
     LockAndDataForMainnetERC20Instance,
     LockAndDataForMainnetInstance,
-    LockAndDataForSchainContract,
-    LockAndDataForSchainInstance,
     MessageProxyForMainnetContract,
     MessageProxyForMainnetInstance,
-    MessageProxyForSchainContract,
-    MessageProxyForSchainInstance,
-      TokenFactoryContract,
-    TokenFactoryInstance,
     } from "../types/truffle-contracts";
 
 import chai = require("chai");
-import { gasMultiplier } from "./utils/command_line";
 
 chai.should();
 chai.use((chaiAsPromised as any));
 
 const MessageProxyForMainnet: MessageProxyForMainnetContract = artifacts.require("./MessageProxyForMainnet");
 const LockAndDataForMainnet: LockAndDataForMainnetContract = artifacts.require("./LockAndDataForMainnet");
-const LockAndDataForSchain: LockAndDataForSchainContract = artifacts.require("./LockAndDataForSchain");
 const LockAndDataForMainnetERC20: LockAndDataForMainnetERC20Contract =
     artifacts.require("./LockAndDataForMainnetERC20");
 const EthERC20: EthERC20Contract = artifacts.require("./EthERC20");
-const TokenFactory: TokenFactoryContract = artifacts.require("./TokenFactory");
 const ERC20ModuleForMainnet: ERC20ModuleForMainnetContract = artifacts.require("./ERC20ModuleForMainnet");
-
-const contractManager = "0x0000000000000000000000000000000000000000";
 
 contract("ERC20ModuleForMainnet", ([deployer, user, invoker]) => {
   let messageProxyForMainnet: MessageProxyForMainnetInstance;
   let lockAndDataForMainnet: LockAndDataForMainnetInstance;
-  // let lockAndDataForSchain: LockAndDataForSchainInstance;
   let lockAndDataForMainnetERC20: LockAndDataForMainnetERC20Instance;
   let ethERC20: EthERC20Instance;
-  // let tokenFactory: TokenFactoryInstance;
   let eRC20ModuleForMainnet: ERC20ModuleForMainnetInstance;
 
   beforeEach(async () => {
     lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
     messageProxyForMainnet = await MessageProxyForMainnet.new(
       "Mainnet", true, lockAndDataForMainnet.address, {from: deployer});
-    // lockAndDataForSchain = await LockAndDataForSchain.new({from: deployer});
     lockAndDataForMainnetERC20 =
         await LockAndDataForMainnetERC20.new(lockAndDataForMainnet.address,
         {from: deployer});
-    // await lockAndDataForMainnet.setContract("LockAndDataERC20", lockAndDataForMainnetERC20.address);
     ethERC20 = await EthERC20.new({from: deployer});
-    // tokenFactory = await TokenFactory.new(lockAndDataForSchain.address,
-        // {from: deployer});
     eRC20ModuleForMainnet = await ERC20ModuleForMainnet.new(lockAndDataForMainnet.address,
         {from: deployer});
   });

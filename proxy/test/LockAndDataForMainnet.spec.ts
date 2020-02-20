@@ -6,14 +6,10 @@ import { DepositBoxContract,
   LockAndDataForMainnetInstance,
   MessageProxyForMainnetContract,
   MessageProxyForMainnetInstance,
-  MessageProxyForSchainContract,
-  MessageProxyForSchainInstance,
   } from "../types/truffle-contracts";
 import { randomString } from "./utils/helper";
-import { skipTime } from "./utils/time";
 
 import chai = require("chai");
-import { gasMultiplier } from "./utils/command_line";
 
 chai.should();
 chai.use((chaiAsPromised as any));
@@ -21,8 +17,6 @@ chai.use((chaiAsPromised as any));
 const MessageProxyForMainnet: MessageProxyForMainnetContract = artifacts.require("./MessageProxyForMainnet");
 const LockAndDataForMainnet: LockAndDataForMainnetContract = artifacts.require("./LockAndDataForMainnet");
 const DepositBox: DepositBoxContract = artifacts.require("./DepositBox");
-
-const contractManager = "0x0000000000000000000000000000000000000000";
 
 contract("LockAndDataForMainnet", ([deployer, user, invoker]) => {
   let messageProxyForMainnet: MessageProxyForMainnetInstance;
