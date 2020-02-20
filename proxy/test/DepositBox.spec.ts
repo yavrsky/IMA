@@ -18,21 +18,15 @@ import { DepositBoxContract,
   LockAndDataForMainnetInstance,
   MessageProxyForMainnetContract,
   MessageProxyForMainnetInstance,
-  MessageProxyForSchainContract,
-  MessageProxyForSchainInstance,
   } from "../types/truffle-contracts";
 import { randomString } from "./utils/helper";
-import { createBytes32 } from "./utils/helper";
-import { skipTime } from "./utils/time";
 
 import chai = require("chai");
-import { gasMultiplier } from "./utils/command_line";
 
 chai.should();
 chai.use((chaiAsPromised as any));
 
 const MessageProxyForMainnet: MessageProxyForMainnetContract = artifacts.require("./MessageProxyForMainnet");
-const MessageProxyForSchain: MessageProxyForSchainContract = artifacts.require("./MessageProxyForSchain");
 const LockAndDataForMainnet: LockAndDataForMainnetContract = artifacts.require("./LockAndDataForMainnet");
 const DepositBox: DepositBoxContract = artifacts.require("./DepositBox");
 const ERC20ModuleForMainnet: ERC20ModuleForMainnetContract = artifacts.require("./ERC20ModuleForMainnet");
@@ -43,8 +37,6 @@ const LockAndDataForMainnetERC20: LockAndDataForMainnetERC20Contract = artifacts
 const LockAndDataForMainnetERC721: LockAndDataForMainnetERC721Contract = artifacts
   .require("./LockAndDataForMainnetERC721");
 const ERC721OnChain: ERC721OnChainContract = artifacts.require("./ERC721OnChain");
-
-const contractManager = "0x0000000000000000000000000000000000000000";
 
 contract("DepositBox", ([deployer, user, invoker]) => {
   let messageProxyForMainnet: MessageProxyForMainnetInstance;
