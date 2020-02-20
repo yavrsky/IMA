@@ -30,4 +30,8 @@ contract ContractManager {
         contracts[contractId] = newContractsAddress;
         emit ContractUpgraded(contractsName, newContractsAddress);
     }
+
+    function getContract(string calldata name) external view returns (address) {
+        return contracts[keccak256(abi.encodePacked(name))];
+    }
 }

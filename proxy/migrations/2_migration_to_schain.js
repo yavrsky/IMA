@@ -34,25 +34,25 @@ async function deploy(deployer, network) {
         process.exit(1);
     }
     let schainName = process.env.SCHAIN_NAME;
-    await deployer.deploy(MessageProxyForSchain, schainName, "0x0000000000000000000000000000000000000000", {gas: gasLimit}).then(async function() {
-        return await deployer.deploy(LockAndDataForSchain, {gas: gasLimit});
-    }).then(async function(inst) {
-        await deployer.deploy(TokenManager, schainName, MessageProxyForSchain.address, inst.address, {gas: gasLimit * gasMultiplier});
+    await deployer.deploy(LockAndDataForSchain, {gas: gasLimit}).then(async function(lockAndDataForSchain) {
+        await deployer.deploy(MessageProxyForSchain, schainName, LockAndDataForSchain.address, {gas: gasLimit});
+        await lockAndDataForSchain.setContract("MessageProxy", MessageProxyForSchain.address);
+        await deployer.deploy(TokenManager, schainName, LockAndDataForSchain.address, {gas: gasLimit * gasMultiplier});
         await deployer.deploy(EthERC20, {gas: gasLimit * gasMultiplier}).then(async function(EthERC20Inst) {
-            await EthERC20Inst.transferOwnership(inst.address, {gas: gasLimit});
+            await EthERC20Inst.transferOwnership(LockAndDataForSchain.address, {gas: gasLimit});
         });
-        await inst.setContract("TokenManager", TokenManager.address);
-        await inst.setEthERC20Address(EthERC20.address);
-        await deployer.deploy(ERC20ModuleForSchain, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("ERC20Module", ERC20ModuleForSchain.address);
-        await deployer.deploy(LockAndDataForSchainERC20, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("LockAndDataERC20", LockAndDataForSchainERC20.address);
-        await deployer.deploy(ERC721ModuleForSchain, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("ERC721Module", ERC721ModuleForSchain.address);
-        await deployer.deploy(LockAndDataForSchainERC721, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("LockAndDataERC721", LockAndDataForSchainERC721.address);
-        await deployer.deploy(TokenFactory, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("TokenFactory", TokenFactory.address);
+        await lockAndDataForSchain.setContract("TokenManager", TokenManager.address);
+        await lockAndDataForSchain.setEthERC20Address(EthERC20.address);
+        await deployer.deploy(ERC20ModuleForSchain, LockAndDataForSchain.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForSchain.setContract("ERC20Module", ERC20ModuleForSchain.address);
+        await deployer.deploy(LockAndDataForSchainERC20, LockAndDataForSchain.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForSchain.setContract("LockAndDataERC20", LockAndDataForSchainERC20.address);
+        await deployer.deploy(ERC721ModuleForSchain, LockAndDataForSchain.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForSchain.setContract("ERC721Module", ERC721ModuleForSchain.address);
+        await deployer.deploy(LockAndDataForSchainERC721, LockAndDataForSchain.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForSchain.setContract("LockAndDataERC721", LockAndDataForSchainERC721.address);
+        await deployer.deploy(TokenFactory, LockAndDataForSchain.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForSchain.setContract("TokenFactory", TokenFactory.address);
 
         let jsonObject = {
             lock_and_data_for_schain_address: LockAndDataForSchain.address,
@@ -99,7 +99,7 @@ async function deploy(deployer, network) {
             message_proxy_chain_address: MessageProxyForSchain.address,
             message_proxy_chain_bytecode: MessageProxyForSchain.bytecode
         }
-    
+
         await fsPromises.writeFile(`data/proxySchain_${schainName}.json`, JSON.stringify(jsonObject));
         await fsPromises.writeFile(`data/proxySchain_${schainName}_bytecode.json`, JSON.stringify(jsonObject2));
         await sleep(10000);

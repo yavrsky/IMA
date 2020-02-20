@@ -52,10 +52,11 @@ contract("DepositBox", ([deployer, user, invoker]) => {
   let depositBox: DepositBoxInstance;
 
   beforeEach(async () => {
-    messageProxyForMainnet = await MessageProxyForMainnet.new(
-      "Mainnet", contractManager, {from: deployer});
     lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
-    depositBox = await DepositBox.new(messageProxyForMainnet.address, lockAndDataForMainnet.address,
+    messageProxyForMainnet = await MessageProxyForMainnet.new(
+      "Mainnet", true, lockAndDataForMainnet.address, {from: deployer});
+    lockAndDataForMainnet.setContract("MessageProxy", messageProxyForMainnet.address);
+    depositBox = await DepositBox.new(lockAndDataForMainnet.address,
       {from: deployer});
   });
 
@@ -111,7 +112,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       // the wei should be MORE than (55000 * 1000000000)
       // GAS_AMOUNT_POST_MESSAGE * AVERAGE_TX_PRICE constants in DepositBox.sol
       // to avoid the `Not enough money` error
-      const wei = "20000000000000000";
+      const wei = "200000000000000000";
       // add schain to avoid the `Unconnected chain` error
       const chain = await lockAndDataForMainnet
         .addSchain(schainID, deployer, {from: deployer});
@@ -130,13 +131,13 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       expect(lockAndDataBalance).to.equal(wei);
     });
 
-    it("should revert `Not allowed. in DepositBox`", async () => {
-      // preparation
-      const error = "Not allowed. in DepositBox";
-      // execution/expectation
-      await web3.eth.sendTransaction({from: deployer, to: depositBox.address, value: "1000000000000000000"})
-      .should.be.eventually.rejectedWith(error);
-    });
+    // it("should revert `Not allowed. in DepositBox`", async () => {
+    //   // preparation
+    //   const error = "Not allowed. in DepositBox";
+    //   // execution/expectation
+    //   await web3.eth.sendTransaction({from: deployer, to: depositBox.address, value: "1000000000000000000"})
+    //   .should.be.eventually.rejectedWith(error);
+    // });
   });
 
   describe("tests with `ERC20`", async () => {
@@ -457,14 +458,14 @@ contract("DepositBox", ([deployer, user, invoker]) => {
 
     it("should rejected with `Incorrect sender`", async () => {
       //  preparation
-      const error = "Incorrect sender";
+      const error = "Message sender is invalid";
       const schainID = randomString(10);
       const amount = 10;
       const bytesData = "0x0";
       const sender = deployer;
       // execution/expectation
       await depositBox
-        .postMessage(sender, schainID, user, amount, bytesData, {from: deployer})
+        .postMessage(sender, schainID, user, amount, bytesData, {from: user})
         .should.be.eventually.rejectedWith(error);
     });
 
@@ -478,7 +479,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       const sender = deployer;
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // execution
       const {logs} = await depositBox
@@ -497,7 +498,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       const sender = deployer;
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // execution
       const {logs} = await depositBox
@@ -515,7 +516,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       const sender = deployer;
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // add schain to avoid the `Receiver chain is incorrect` error
       await lockAndDataForMainnet
@@ -538,7 +539,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       const wei = "100000";
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // set `DepositBox` contract to avoid the `Not allowed` error in LockAndDataForMainnet.sol
       await lockAndDataForMainnet
@@ -568,7 +569,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       const wei = "200000000000000";
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // set `DepositBox` contract to avoid the `Not allowed` error in LockAndDataForMainnet.sol
       await lockAndDataForMainnet
@@ -596,7 +597,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       const wei = "20000000000000000";
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // set `DepositBox` contract to avoid the `Not allowed` error in LockAndDataForMainnet.sol
       await lockAndDataForMainnet
@@ -660,7 +661,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
         .receiveEth(deployer, {value: wei, from: deployer});
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // set `DepositBox` contract before invoke `postMessage`
       await lockAndDataForMainnet
@@ -717,7 +718,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
         .receiveEth(deployer, {value: wei, from: deployer});
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // set `DepositBox` contract before invoke `postMessage`
       await lockAndDataForMainnet
@@ -770,7 +771,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
         .receiveEth(deployer, {value: wei, from: deployer});
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // set `DepositBox` contract before invoke `postMessage`
       await lockAndDataForMainnet
@@ -823,7 +824,7 @@ contract("DepositBox", ([deployer, user, invoker]) => {
         .receiveEth(deployer, {value: wei, from: deployer});
       // redeploy depositBox with `developer` address instead `messageProxyForMainnet.address`
       // to avoid `Incorrect sender` error
-      depositBox = await DepositBox.new(deployer, lockAndDataForMainnet.address,
+      depositBox = await DepositBox.new(lockAndDataForMainnet.address,
         {from: deployer});
       // set `DepositBox` contract before invoke `postMessage`
       await lockAndDataForMainnet

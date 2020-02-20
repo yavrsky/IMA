@@ -11,16 +11,11 @@ import {
     LockAndDataForSchainERC20Contract,
     LockAndDataForSchainERC20Instance,
     LockAndDataForSchainInstance,
-    MessageProxyForMainnetContract,
-    MessageProxyForMainnetInstance,
-    MessageProxyForSchainContract,
-    MessageProxyForSchainInstance,
     TokenFactoryContract,
     TokenFactoryInstance,
     } from "../types/truffle-contracts";
 
 import chai = require("chai");
-import { gasMultiplier } from "./utils/command_line";
 
 chai.should();
 chai.use((chaiAsPromised as any));
@@ -28,7 +23,6 @@ chai.use((chaiAsPromised as any));
 // tslint:disable-next-line: no-var-requires
 const ABIERC20OnChain = require("../build/contracts/ERC20OnChain.json");
 
-const MessageProxyForMainnet: MessageProxyForMainnetContract = artifacts.require("./MessageProxyForMainnet");
 const LockAndDataForSchain: LockAndDataForSchainContract = artifacts.require("./LockAndDataForSchain");
 const LockAndDataForSchainERC20: LockAndDataForSchainERC20Contract =
     artifacts.require("./LockAndDataForSchainERC20");
@@ -37,10 +31,7 @@ const TokenFactory: TokenFactoryContract = artifacts.require("./TokenFactory");
 const ERC20ModuleForSchain: ERC20ModuleForSchainContract = artifacts.require("./ERC20ModuleForSchain");
 const ERC20OnChain: ERC20OnChainContract = artifacts.require("./ERC20OnChain");
 
-const contractManager = "0x0000000000000000000000000000000000000000";
-
 contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
-  let messageProxyForMainnet: MessageProxyForMainnetInstance;
   let lockAndDataForSchain: LockAndDataForSchainInstance;
   let lockAndDataForSchainERC20: LockAndDataForSchainERC20Instance;
   let ethERC20: EthERC20Instance;
@@ -50,8 +41,6 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
   let eRC20OnChain2: ERC20OnChainInstance;
 
   beforeEach(async () => {
-    messageProxyForMainnet = await MessageProxyForMainnet.new(
-      "Schain", contractManager, {from: deployer});
     lockAndDataForSchain = await LockAndDataForSchain.new({from: deployer});
     lockAndDataForSchainERC20 =
         await LockAndDataForSchainERC20.new(lockAndDataForSchain.address,

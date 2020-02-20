@@ -45,9 +45,10 @@ contract("LockAndDataForMainnetERC721", ([deployer, user, invoker]) => {
   let eRC721OnChain: ERC721OnChainInstance;
 
   beforeEach(async () => {
-    messageProxyForMainnet = await MessageProxyForMainnet.new(
-        "Mainnet", contractManager, {from: deployer});
     lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
+    messageProxyForMainnet = await MessageProxyForMainnet.new(
+        "Mainnet", true, lockAndDataForMainnet.address, {from: deployer});
+    lockAndDataForMainnet.setContract("MessageProxy", messageProxyForMainnet.address);
     lockAndDataForSchain = await LockAndDataForSchain.new({from: deployer});
     lockAndDataForMainnetERC721 =
         await LockAndDataForMainnetERC721.new(lockAndDataForMainnet.address,

@@ -6,7 +6,7 @@ let jsonData = require("../data/skaleManagerComponents.json");
 
 const gasMultiplierParameter = 'gas_multiplier';
 const argv = require('minimist')(process.argv.slice(2), {string: [gasMultiplierParameter]});
-const gasMultiplier = argv[gasMultiplierParameter] === undefined ? 1 : Number(argv[gasMultiplierParameter])
+const gasMultiplier = argv[gasMultiplierParameter] === undefined ? 1 : Number(argv[gasMultiplierParameter]);
 
 let MessageProxyForMainnet = artifacts.require("./MessageProxyForMainnet.sol");
 let DepositBox = artifacts.require("./DepositBox.sol");
@@ -20,19 +20,22 @@ let gasLimit = 8000000;
 
 async function deploy(deployer, network) {
 
-    await deployer.deploy(MessageProxyForMainnet, "Mainnet", jsonData.contract_manager_address /*"0x0000000000000000000000000000000000000000"*/, {gas: gasLimit}).then(async function() {
-        return await deployer.deploy(LockAndDataForMainnet, {gas: gasLimit});
-    }).then(async function(inst) {
-        await deployer.deploy(DepositBox, MessageProxyForMainnet.address, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("DepositBox", DepositBox.address);
-        await deployer.deploy(ERC20ModuleForMainnet, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("ERC20Module", ERC20ModuleForMainnet.address);
-        await deployer.deploy(LockAndDataForMainnetERC20, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("LockAndDataERC20", LockAndDataForMainnetERC20.address);
-        await deployer.deploy(ERC721ModuleForMainnet, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("ERC721Module", ERC721ModuleForMainnet.address);
-        await deployer.deploy(LockAndDataForMainnetERC721, inst.address, {gas: gasLimit * gasMultiplier});
-        await inst.setContract("LockAndDataERC721", LockAndDataForMainnetERC721.address);
+    await deployer.deploy(LockAndDataForMainnet, {gas: gasLimit}).then(async function(lockAndDataForMainnet) {
+        await deployer.deploy(MessageProxyForMainnet, "Mainnet", process.env.BLS_ENABLED, LockAndDataForMainnet.address, {gas: gasLimit});
+        await lockAndDataForMainnet.setContract("MessageProxy", MessageProxyForMainnet.address);
+        await deployer.deploy(DepositBox, LockAndDataForMainnet.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForMainnet.setContract("DepositBox", DepositBox.address);
+        await deployer.deploy(ERC20ModuleForMainnet, LockAndDataForMainnet.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForMainnet.setContract("ERC20Module", ERC20ModuleForMainnet.address);
+        await deployer.deploy(LockAndDataForMainnetERC20, LockAndDataForMainnet.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForMainnet.setContract("LockAndDataERC20", LockAndDataForMainnetERC20.address);
+        await deployer.deploy(ERC721ModuleForMainnet, LockAndDataForMainnet.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForMainnet.setContract("ERC721Module", ERC721ModuleForMainnet.address);
+        await deployer.deploy(LockAndDataForMainnetERC721, LockAndDataForMainnet.address, {gas: gasLimit * gasMultiplier});
+        await lockAndDataForMainnet.setContract("LockAndDataERC721", LockAndDataForMainnetERC721.address);
+        if (process.env.BLS_ENABLED == "true") {
+            await lockAndDataForMainnet.setContract("ContractManagerForSkaleManager", jsonData.contract_manager_address);
+        }
 
         let jsonObject = {
             lock_and_data_for_mainnet_address: LockAndDataForMainnet.address,

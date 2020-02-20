@@ -22,7 +22,7 @@ pragma solidity ^0.5.3;
 import "./OwnableForMainnet.sol";
 
 interface IContractManagerForMainnet {
-    function permitted(bytes32 contractName) external view returns (address);
+    function getContract(string calldata name) external view returns (address);
 }
 
 
@@ -54,7 +54,7 @@ contract PermissionsForMainnet is OwnableForMainnet {
      */
     modifier allow(string memory contractName) {
         require(
-            IContractManagerForMainnet(lockAndDataAddress_).permitted(keccak256(abi.encodePacked(contractName))) == msg.sender ||
+            IContractManagerForMainnet(lockAndDataAddress_).getContract(contractName) == msg.sender ||
             getOwner() == msg.sender, "Message sender is invalid"
         );
         _;

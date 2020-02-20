@@ -1,4 +1,3 @@
-import { BigNumber } from "bignumber.js";
 import * as chaiAsPromised from "chai-as-promised";
 import {
     ERC721ModuleForMainnetContract,
@@ -9,37 +8,26 @@ import {
     LockAndDataForMainnetERC721Contract,
     LockAndDataForMainnetERC721Instance,
     LockAndDataForMainnetInstance,
-    MessageProxyForMainnetContract,
-    MessageProxyForMainnetInstance,
-    MessageProxyForSchainContract,
-    MessageProxyForSchainInstance,
     } from "../types/truffle-contracts";
 
 import chai = require("chai");
-import { gasMultiplier } from "./utils/command_line";
 
 chai.should();
 chai.use((chaiAsPromised as any));
 
-const MessageProxyForMainnet: MessageProxyForMainnetContract = artifacts.require("./MessageProxyForMainnet");
 const LockAndDataForMainnet: LockAndDataForMainnetContract = artifacts.require("./LockAndDataForMainnet");
 const LockAndDataForMainnetERC721: LockAndDataForMainnetERC721Contract =
     artifacts.require("./LockAndDataForMainnetERC721");
 const ERC721OnChain: ERC721OnChainContract = artifacts.require("./ERC721OnChain");
 const ERC721ModuleForMainnet: ERC721ModuleForMainnetContract = artifacts.require("./ERC721ModuleForMainnet");
 
-const contractManager = "0x0000000000000000000000000000000000000000";
-
 contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
-  let messageProxyForMainnet: MessageProxyForMainnetInstance;
   let lockAndDataForMainnet: LockAndDataForMainnetInstance;
   let lockAndDataForMainnetERC721: LockAndDataForMainnetERC721Instance;
   let eRC721OnChain: ERC721OnChainInstance;
   let eRC721ModuleForMainnet: ERC721ModuleForMainnetInstance;
 
   beforeEach(async () => {
-    messageProxyForMainnet = await MessageProxyForMainnet.new(
-      "Mainnet", contractManager, {from: deployer});
     lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
     lockAndDataForMainnetERC721 =
         await LockAndDataForMainnetERC721.new(lockAndDataForMainnet.address,

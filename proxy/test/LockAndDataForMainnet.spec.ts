@@ -30,11 +30,12 @@ contract("LockAndDataForMainnet", ([deployer, user, invoker]) => {
   let depositBox: DepositBoxInstance;
 
   beforeEach(async () => {
-    messageProxyForMainnet = await MessageProxyForMainnet.new(
-      "Mainnet", contractManager, {from: deployer});
     lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
-    depositBox = await DepositBox.new(messageProxyForMainnet.address, lockAndDataForMainnet.address,
-       {from: deployer});
+    messageProxyForMainnet = await MessageProxyForMainnet.new(
+      "Mainnet", true, lockAndDataForMainnet.address, {from: deployer});
+    lockAndDataForMainnet.setContract("MessageProxy", messageProxyForMainnet.address);
+    depositBox = await DepositBox.new(lockAndDataForMainnet.address,
+      {from: deployer});
   });
 
   it("should add wei to `lockAndDataForMainnet`", async () => {

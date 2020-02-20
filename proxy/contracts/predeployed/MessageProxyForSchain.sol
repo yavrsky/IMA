@@ -21,6 +21,7 @@ pragma solidity ^0.5.3;
 pragma experimental ABIEncoderV2;
 
 import "./SkaleFeatures.sol";
+import "./PermissionsForSchain.sol";
 
 interface ContractReceiverForSchain {
     function postMessage(
@@ -34,7 +35,7 @@ interface ContractReceiverForSchain {
 }
 
 
-contract MessageProxyForSchain {
+contract MessageProxyForSchain is PermissionsForSchain {
 
     // Note: this uses assembly example from
 
@@ -58,6 +59,8 @@ contract MessageProxyForSchain {
     address public ownerAddress; // l_sergiy: changed name to ownerAddress
 
     bool mainnetConnected = false;
+
+    bool blsEnabled = false;
 
     mapping(address => bool) private authorizedCaller_; // l_sergiy: changed name _ and made private
 
@@ -136,7 +139,14 @@ contract MessageProxyForSchain {
 
     /// Create a new message proxy
 
-    constructor(string memory newChainID, address newContractManager) public {
+    constructor(
+        string memory newChainID,
+        bool newBlsEnabled,
+        address newLockAndDataAddress
+    )
+        PermissionsForSchain(newLockAndDataAddress)
+        public
+    {
         isCustomDeploymentMode_ = true;
         ownerAddress = msg.sender;
         authorizedCaller_[msg.sender] = true;
@@ -160,6 +170,7 @@ contract MessageProxyForSchain {
                 true);
             mainnetConnected = true;
         }
+        blsEnabled = newBlsEnabled;
         // else {
         //     contractManagerSkaleManager = newContractManager;
         // }
@@ -344,9 +355,9 @@ contract MessageProxyForSchain {
     //     view
     //     returns (bool)
     // {
-    //     address skaleVerifierAddress = IContractManagerSkaleManager(contractManagerSkaleManager).contracts(
-    //         keccak256(abi.encodePacked("SkaleVerifier"))
-    //     );
+    //     address contractManagerSkaleManager = IContractManagerForMainnet(getLockAndDataAddress()).getContract("ContractManagerForSkaleManager");
+    //     require(contractManagerSkaleManager != address(0), "Contract Manager For Skale Manager did not connect!");
+    //     address skaleVerifierAddress = IContractManagerSkaleManager(contractManagerSkaleManager).getContract("SkaleVerifier");
     //     return ISkaleVerifier(skaleVerifierAddress).verifySchainSignature(
     //         blsSignature[0],
     //         blsSignature[1],

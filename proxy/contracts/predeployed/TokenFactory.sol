@@ -124,7 +124,7 @@ contract TokenFactory is PermissionsForSchain {
         uint8 decimals;
         uint256 totalSupply;
         (name, symbol, decimals, totalSupply) = fallbackDataCreateERC20Parser(data);
-        address erc20ModuleAddress = IContractManagerForSchain(getLockAndDataAddress()).permitted(keccak256(abi.encodePacked("ERC20Module")));
+        address erc20ModuleAddress = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
         ERC20OnChain newERC20 = new ERC20OnChain(
             name,
             symbol,
@@ -132,7 +132,7 @@ contract TokenFactory is PermissionsForSchain {
             totalSupply,
             erc20ModuleAddress
         );
-        address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).permitted(keccak256(abi.encodePacked("LockAndDataERC20")));
+        address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         newERC20.addMinter(lockAndDataERC20);
         newERC20.renounceMinter();
         return address(newERC20);
@@ -148,7 +148,7 @@ contract TokenFactory is PermissionsForSchain {
         (name, symbol) = fallbackDataCreateERC721Parser(data);
         ERC721OnChain newERC721 = new ERC721OnChain(name, symbol);
         address lockAndDataERC721 = IContractManagerForSchain(getLockAndDataAddress()).
-            permitted(keccak256(abi.encodePacked("LockAndDataERC721")));
+            getContract("LockAndDataERC721");
         newERC721.addMinter(lockAndDataERC721);
         newERC721.renounceMinter();
         return address(newERC721);

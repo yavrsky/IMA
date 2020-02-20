@@ -45,9 +45,10 @@ contract("LockAndDataForMainnetERC20", ([deployer, user, invoker]) => {
   let tokenFactory: TokenFactoryInstance;
 
   beforeEach(async () => {
-    messageProxyForMainnet = await MessageProxyForMainnet.new(
-        "Mainnet", contractManager, {from: deployer});
     lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
+    messageProxyForMainnet = await MessageProxyForMainnet.new(
+        "Mainnet", true, lockAndDataForMainnet.address, {from: deployer});
+    lockAndDataForMainnet.setContract("MessageProxy", messageProxyForMainnet.address);
     lockAndDataForSchain = await LockAndDataForSchain.new({from: deployer});
     lockAndDataForMainnetERC20 =
         await LockAndDataForMainnetERC20.new(lockAndDataForMainnet.address,
