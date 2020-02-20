@@ -35,7 +35,7 @@ async function deploy(deployer, network) {
     }
     let schainName = process.env.SCHAIN_NAME;
     await deployer.deploy(LockAndDataForSchain, {gas: gasLimit}).then(async function(lockAndDataForSchain) {
-        await deployer.deploy(MessageProxyForSchain, schainName, LockAndDataForSchain.address, {gas: gasLimit});
+        await deployer.deploy(MessageProxyForSchain, schainName, process.env.BLS_ENABLED, LockAndDataForSchain.address, {gas: gasLimit});
         await lockAndDataForSchain.setContract("MessageProxy", MessageProxyForSchain.address);
         await deployer.deploy(TokenManager, schainName, LockAndDataForSchain.address, {gas: gasLimit * gasMultiplier});
         await deployer.deploy(EthERC20, {gas: gasLimit * gasMultiplier}).then(async function(EthERC20Inst) {
