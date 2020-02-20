@@ -37,15 +37,6 @@ interface IContractManagerSkaleManager {
     function getContract(string calldata name) external view returns (address);
 }
 
-interface ILockAndDataDB {
-    function setContract(string calldata contractName, address newContract) external;
-    function tokenManagerAddresses(bytes32 schainHash) external returns (address);
-    function sendEth(address to, uint amount) external returns (bool);
-    function approveTransfer(address to, uint amount) external;
-    function addSchain(string calldata schainID, address tokenManagerAddress) external;
-    function receiveEth(address from) external payable;
-}
-
 interface ISkaleVerifier {
     function verifySchainSignature(
         uint signA,
