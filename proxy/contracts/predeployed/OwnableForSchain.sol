@@ -17,7 +17,7 @@
  *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 
 import "./SkaleFeatures.sol";
 
@@ -55,7 +55,7 @@ contract OwnableForSchain {
     /**
      * @dev Returns owner address.
      */
-    function getOwner() public view returns ( address ow ) {
+    function getOwner() public view virtual returns ( address ow ) {
         if ((ownerAddress) == (address(0)) )
             return SkaleFeatures(0x00c033b369416c9ecd8e4a07aafa8b06b4107419e2).getConfigVariableAddress("skaleConfig.contractSettings.IMA.ownerAddress");
         return ownerAddress;

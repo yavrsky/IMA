@@ -136,6 +136,11 @@
     web3-eth-abi "1.2.1"
     web3-utils "1.2.1"
 
+"@openzeppelin/contracts@^3.0.0-beta.0":
+  version "3.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.0.0-beta.0.tgz#bf62bb570ff1abd57e15dfa145893f81c209d021"
+  integrity sha512-UDYQdvSDjXcnHXBs3QVVoPY2nxpr56cRPN2jo1ahjPsalilr5LPGlCW85zkoHx6AInqm4ZdGnbspgBS5/DvzDw==
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -5130,11 +5135,6 @@ once@1.x, once@^1.3.0, once@^1.3.1, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-openzeppelin-solidity@^2.2.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/openzeppelin-solidity/-/openzeppelin-solidity-2.3.0.tgz#1ab7b4cc3782a5472ed61eb740c56a8bfdd74119"
-  integrity sha512-QYeiPLvB1oSbDt6lDQvvpx7k8ODczvE474hb2kLXZBPKMsxKT1WxTCHBYrCU7kS7hfAku4DcJ0jqOyL+jvjwQw==
-
 optimist@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
@@ -6929,7 +6929,7 @@ truffle-hdwallet-provider@^1.0.9:
     web3 "1.2.1"
     websocket "^1.0.28"
 
-truffle-typings@1.0.8:
+truffle-typings@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/truffle-typings/-/truffle-typings-1.0.8.tgz#0b92d86a86a77c43771cdbce2544b67a25e3f2e2"
   integrity sha512-75yFYNt0ws1TTehrGxhOqH3tutvBCAs+RG2SrhVIqQvU72kLAb4ercl32dES8yKbXBVHjzv3OXNg5gsbak+3Dg==
@@ -6938,10 +6938,10 @@ truffle-typings@1.0.8:
     "@types/mocha" "^5.2.5"
     "@types/web3" "^1.0.18"
 
-truffle@^5.0.12:
-  version "5.0.39"
-  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.0.39.tgz#5710ba8f60a7184d9eb51d632308f2af0a2e8aff"
-  integrity sha512-2a17t4o6r0rNMpeQXBc51nXigtIaP9/sU8N2zflaazvzYgDgLMZfqh/dir2mTfyybOsrR47NL310p+6+c8u8VA==
+truffle@^5.1.5:
+  version "5.1.14"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.1.14.tgz#18dde420cd88d8214451d59d1cf554c83f54dcd4"
+  integrity sha512-6rIy335igwHOR0a8xEtPZdlCPBAvDcMIuVQVWAVtPqDy7xMTxGm4A0C4YRsEvZUc5V8GfCBfQb/GQ5AXlXI+6w==
   dependencies:
     app-module-path "^2.2.0"
     mocha "5.2.0"

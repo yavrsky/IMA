@@ -17,7 +17,7 @@
  *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
 import "./SkaleFeatures.sol";
@@ -56,7 +56,6 @@ contract MessageProxyForSchain is PermissionsForSchain {
     string private chainID_; // l_sergiy: changed name _ and made private
 
     // Owner of this chain. For mainnet, the owner is SkaleManager
-    address public ownerAddress; // l_sergiy: changed name to ownerAddress
 
     bool mainnetConnected = false;
 
@@ -112,27 +111,6 @@ contract MessageProxyForSchain is PermissionsForSchain {
                 0,
                 true);
             mainnetConnected = true;
-            // string memory newChainID;
-            // address newOwner;
-            // uint length;
-            // assembly {
-            //     newChainID := sload(0x00)
-            //     newOwner := sload(0x01)
-            //     length := sload(0x02)
-            // }
-            // chainID_ = newChainID;
-
-            // // l_sergiy: owner can be changed only via contract OwnableForSchain -> transferOwnership()
-            // setOwner(newOwner);
-
-            // address callerAddr;
-            // bytes1 index = 0x03;
-            // for (uint i = 0; i < length; i++) {
-            //     assembly {
-            //         callerAddr := sload(add(index, i))
-            //     }
-            //     authorizedCaller_[callerAddr] = true;
-            // }
         }
         _;
     }
@@ -148,7 +126,6 @@ contract MessageProxyForSchain is PermissionsForSchain {
         public
     {
         isCustomDeploymentMode_ = true;
-        ownerAddress = msg.sender;
         authorizedCaller_[msg.sender] = true;
         chainID_ = newChainID;
         if (keccak256(abi.encodePacked(newChainID)) !=
@@ -375,18 +352,6 @@ contract MessageProxyForSchain is PermissionsForSchain {
                 return SkaleFeatures(0x00c033b369416c9ecd8e4a07aafa8b06b4107419e2).getConfigVariableString("skaleConfig.sChain.schainID");
         }
         return chainID_;
-    }
-
-    function getOwner() public view returns ( address ow ) { // l_sergiy: added
-        if (!isCustomDeploymentMode_) {
-            if ((ownerAddress) == (address(0)) )
-                return SkaleFeatures(0x00c033b369416c9ecd8e4a07aafa8b06b4107419e2).getConfigVariableAddress("skaleConfig.contractSettings.IMA.ownerAddress");
-        }
-        return ownerAddress;
-    }
-
-    function setOwner( address newAddressOwner ) public {
-        ownerAddress = newAddressOwner;
     }
 
     function checkIsAuthorizedCaller( address a ) public view returns ( bool rv ) { // l_sergiy: added

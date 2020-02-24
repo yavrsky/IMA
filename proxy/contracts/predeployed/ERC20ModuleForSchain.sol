@@ -17,10 +17,10 @@
  *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 
 import "./PermissionsForSchain.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 
 interface ITokenFactoryForERC20 {
     function createERC20(bytes calldata data)

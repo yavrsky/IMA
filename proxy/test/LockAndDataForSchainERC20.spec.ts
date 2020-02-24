@@ -90,7 +90,7 @@ contract("LockAndDataForSchainERC20", ([deployer, user, invoker]) => {
     // expectation
     expect(await lockAndDataForSchainERC20.erc20Tokens(contractPosition)).to.be.equal(addressERC20);
     expect(parseInt(
-        new BigNumber(await lockAndDataForSchainERC20.erc20Mapper(addressERC20))
+        web3.utils.toBN(await lockAndDataForSchainERC20.erc20Mapper(addressERC20))
         .toString(), 10))
         .to.be.equal(contractPosition);
   });

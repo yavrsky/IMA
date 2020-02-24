@@ -17,14 +17,14 @@
  *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 
 import "./PermissionsForMainnet.sol";
 import "./interfaces/IMessageProxy.sol";
 import "./interfaces/IERC20Module.sol";
 import "./interfaces/IERC721Module.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/IERC721Full.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Full.sol";
 
 
 interface ILockAndDataDB {
@@ -92,9 +92,9 @@ contract DepositBox is PermissionsForMainnet {
 
     }
 
-    function() external payable {
-        revert("Not allowed. in DepositBox");
-    }
+    // receive() external payable {
+    //     revert("Not allowed. in DepositBox");
+    // }
 
     function depositWithoutData(string calldata schainID, address to) external payable {
         deposit(schainID, to);

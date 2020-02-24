@@ -17,11 +17,11 @@
  *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 
 
 import "./PermissionsForMainnet.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
 contract LockAndDataForMainnetERC20 is PermissionsForMainnet {

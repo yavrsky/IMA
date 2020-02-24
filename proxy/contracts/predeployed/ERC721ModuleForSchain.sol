@@ -1,7 +1,7 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 
 import "./PermissionsForSchain.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/IERC721Full.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Full.sol";
 
 interface ITokenFactoryForERC721 {
     function createERC721(bytes calldata data)

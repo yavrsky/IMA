@@ -96,9 +96,9 @@ contract("TokenManager", ([user, deployer, client]) => {
     });
 
     it("should send Eth to somebody on Mainnet, closed to Mainnet, called by schain", async () => {
-        const amount = new BigNumber("20000000000000000");
-        const amountTo = new BigNumber("2000000000000000");
-        const amountAfter = new BigNumber("18000000000000000");
+        const amount = web3.utils.toBN("20000000000000000");
+        const amountTo = web3.utils.toBN("2000000000000000");
+        const amountAfter = web3.utils.toBN("18000000000000000");
         const to = deployer;
 
         // set EthERC20 address:
@@ -111,18 +111,18 @@ contract("TokenManager", ([user, deployer, client]) => {
         await ethERC20.transferOwnership(lockAndDataForSchain.address, {from: deployer});
 
         // send Eth:
-        await lockAndDataForSchain.sendEth(user, amount, {from: deployer});
+        await lockAndDataForSchain.sendEth(user, amount.toString(), {from: deployer});
 
         // send Eth to a client on Mainnet:
-        await tokenManager.exitToMainWithoutData(to, amountTo, {from: user});
-        const balanceAfter = new BigNumber(await ethERC20.balanceOf(user));
-        balanceAfter.should.be.deep.equal(amountAfter);
+        await tokenManager.exitToMainWithoutData(to, amountTo.toString(), {from: user});
+        const balanceAfter = web3.utils.toBN(await ethERC20.balanceOf(user));
+        balanceAfter.toString().should.be.deep.equal(amountAfter.toString());
     });
 
     it("should transfer to somebody on schain Eth and some data", async () => {
-        const amount = new BigNumber("20000000000000000");
-        const amountTo = new BigNumber("2000000000000000");
-        const amountAfter = new BigNumber("18000000000000000");
+        const amount = web3.utils.toBN("20000000000000000");
+        const amountTo = web3.utils.toBN("2000000000000000");
+        const amountAfter = web3.utils.toBN("18000000000000000");
         const bytesData = "0x0";
         const to = deployer;
 
@@ -139,22 +139,22 @@ contract("TokenManager", ([user, deployer, client]) => {
         await ethERC20.transferOwnership(lockAndDataForSchain.address, {from: deployer});
 
         // send Eth:
-        await lockAndDataForSchain.sendEth(user, amount, {from: deployer});
+        await lockAndDataForSchain.sendEth(user, amount.toString(), {from: deployer});
 
         // add schain:
         await lockAndDataForSchain.addSchain(chainID, user, {from: deployer});
 
         // send Eth and data to a client on schain:
-        await tokenManager.transferToSchainWithoutData(chainID, to, amountTo, {from: user});
+        await tokenManager.transferToSchainWithoutData(chainID, to, amountTo.toString(), {from: user});
 
-        const balanceAfter = new BigNumber(await ethERC20.balanceOf(user));
-        balanceAfter.should.be.deep.equal(amountAfter);
+        const balanceAfter = web3.utils.toBN(await ethERC20.balanceOf(user));
+        balanceAfter.toString().should.be.deep.equal(amountAfter.toString());
     });
 
     it("should add Eth cost", async () => {
-        const amount = new BigNumber("200000000000000000");
-        const amountTo = new BigNumber("20000000000000000");
-        const amountAfter = new BigNumber("180000000000000000");
+        const amount = web3.utils.toBN("200000000000000000");
+        const amountTo = web3.utils.toBN("20000000000000000");
+        const amountAfter = web3.utils.toBN("180000000000000000");
 
         // set EthERC20 address:
         await lockAndDataForSchain.setEthERC20Address(ethERC20.address, {from: deployer});
@@ -169,25 +169,25 @@ contract("TokenManager", ([user, deployer, client]) => {
         await ethERC20.transferOwnership(lockAndDataForSchain.address, {from: deployer});
 
         // send Eth:
-        await lockAndDataForSchain.sendEth(user, amount, {from: deployer});
+        await lockAndDataForSchain.sendEth(user, amount.toString(), {from: deployer});
 
         // // add schain:
         await lockAndDataForSchain.addSchain(chainID, user, {from: deployer});
 
         // add Eth cost:
-        await tokenManager.addEthCostWithoutAddress(amountTo, {from: user});
+        await tokenManager.addEthCostWithoutAddress(amountTo.toString(), {from: user});
 
-        const balanceAfter = new BigNumber(await ethERC20.balanceOf(user));
-        balanceAfter.should.be.deep.equal(amountAfter);
+        const balanceAfter = web3.utils.toBN(await ethERC20.balanceOf(user));
+        balanceAfter.toString().should.be.deep.equal(amountAfter.toString());
 
-        const ethCosts = new BigNumber(await lockAndDataForSchain.ethCosts(user));
-        ethCosts.should.be.deep.equal(amountTo);
+        const ethCosts = web3.utils.toBN(await lockAndDataForSchain.ethCosts(user));
+        ethCosts.toString().should.be.deep.equal(amountTo.toString());
     });
 
     it("should remove Eth cost", async () => {
-        const amount = new BigNumber("200000000000000000");
-        const amountTo = new BigNumber("20000000000000000");
-        const amountAfter = new BigNumber("180000000000000000");
+        const amount = web3.utils.toBN("200000000000000000");
+        const amountTo = web3.utils.toBN("20000000000000000");
+        const amountAfter = web3.utils.toBN("180000000000000000");
 
         // set EthERC20 address:
         await lockAndDataForSchain.setEthERC20Address(ethERC20.address, {from: deployer});
@@ -202,33 +202,33 @@ contract("TokenManager", ([user, deployer, client]) => {
         await ethERC20.transferOwnership(lockAndDataForSchain.address, {from: deployer});
 
         // send Eth:
-        await lockAndDataForSchain.sendEth(user, amount, {from: deployer});
+        await lockAndDataForSchain.sendEth(user, amount.toString(), {from: deployer});
 
         // // add schain:
         await lockAndDataForSchain.addSchain(chainID, user, {from: deployer});
 
         // add Eth cost:
-        await tokenManager.addEthCostWithoutAddress(amountTo, {from: user});
+        await tokenManager.addEthCostWithoutAddress(amountTo.toString(), {from: user});
 
-        const balanceAfter = new BigNumber(await ethERC20.balanceOf(user));
-        balanceAfter.should.be.deep.equal(amountAfter);
+        const balanceAfter = web3.utils.toBN(await ethERC20.balanceOf(user));
+        balanceAfter.toString().should.be.deep.equal(amountAfter.toString());
 
-        const ethCosts = new BigNumber(await lockAndDataForSchain.ethCosts(user));
-        ethCosts.should.be.deep.equal(amountTo);
+        const ethCosts = web3.utils.toBN(await lockAndDataForSchain.ethCosts(user));
+        ethCosts.toString().should.be.deep.equal(amountTo.toString());
 
         await tokenManager.removeEthCost({from: user});
 
-        const balanceAfterY = new BigNumber(await ethERC20.balanceOf(user));
-        balanceAfterY.should.be.deep.equal(amount);
+        const balanceAfterY = web3.utils.toBN(await ethERC20.balanceOf(user));
+        balanceAfterY.toString().should.be.deep.equal(amount.toString());
 
-        const ethCostsY = new BigNumber(await lockAndDataForSchain.ethCosts(user));
-        ethCostsY.should.be.deep.equal(new BigNumber(0));
+        const ethCostsY = web3.utils.toBN(await lockAndDataForSchain.ethCosts(user));
+        ethCostsY.toString().should.be.deep.equal("0");
     });
 
     it("should rejected with `Not allowed ERC20 Token` when invoke `exitToMainERC20`", async () => {
         const error = "Not allowed ERC20 Token";
-        const amount = new BigNumber(200);
-        const amountTo = new BigNumber(20);
+        const amount = web3.utils.toBN(200);
+        const amountTo = web3.utils.toBN(20);
         //
         await lockAndDataForSchain.setContract("ERC20Module", eRC20ModuleForSchain.address, {from: deployer});
         await lockAndDataForSchain
@@ -237,18 +237,18 @@ contract("TokenManager", ([user, deployer, client]) => {
         await eRC20OnChain.addMinter(lockAndDataForSchainERC20.address, {from: deployer});
         //
         await lockAndDataForSchainERC20
-            .sendERC20(eRC20OnChain.address, user, amount, {from: deployer});
+            .sendERC20(eRC20OnChain.address, user, amount.toString(), {from: deployer});
         //
-        await eRC20OnChain.approve(tokenManager.address, amountTo, {from: user});
+        await eRC20OnChain.approve(tokenManager.address, amountTo.toString(), {from: user});
         // execution/expectation
-        await tokenManager.exitToMainERC20(eRC20OnChain.address, client, amountTo, {from: deployer})
+        await tokenManager.exitToMainERC20(eRC20OnChain.address, client, amountTo.toString(), {from: deployer})
             .should.be.eventually.rejectedWith(error);
     });
 
     it("should rejected with `Not enough gas sent` when invoke `exitToMainERC20`", async () => {
         const error = "Not enough gas sent";
-        const amount = new BigNumber(200);
-        const amountTo = new BigNumber(20);
+        const amount = web3.utils.toBN(200);
+        const amountTo = web3.utils.toBN(20);
         // set contract TokenManager:
         await lockAndDataForSchain.setContract("TokenManager", tokenManager.address, {from: deployer});
         await lockAndDataForSchain.setContract("ERC20Module", eRC20ModuleForSchain.address, {from: deployer});
@@ -256,9 +256,9 @@ contract("TokenManager", ([user, deployer, client]) => {
             .setContract("LockAndDataERC20", lockAndDataForSchainERC20.address, {from: deployer});
         // invoke `addMinter` before `sendERC20` to avoid `MinterRole: caller does not have the Minter role` exception
         await eRC20OnChain.addMinter(lockAndDataForSchainERC20.address, {from: deployer});
-        await eRC20OnChain.mint(deployer, amount, {from: deployer});
-        await eRC20OnChain.approve(tokenManager.address, amountTo, {from: deployer});
-        await tokenManager.exitToMainERC20(eRC20OnChain.address, client, amountTo, {from: deployer})
+        await eRC20OnChain.mint(deployer, amount.toString(), {from: deployer});
+        await eRC20OnChain.approve(tokenManager.address, amountTo.toString(), {from: deployer});
+        await tokenManager.exitToMainERC20(eRC20OnChain.address, client, amountTo.toString(), {from: deployer})
             .should.be.eventually.rejectedWith(error);
     });
 
@@ -315,14 +315,14 @@ contract("TokenManager", ([user, deployer, client]) => {
             .exitToMainERC20(eRC20OnChain.address, client, amountReduceCoast, {from: deployer});
 
         // expectation:
-        const outgoingMessagesCounterMainnet = new BigNumber(await messageProxyForSchain.getOutgoingMessagesCounter("Mainnet"));
-        outgoingMessagesCounterMainnet.should.be.deep.equal(new BigNumber(1));
+        const outgoingMessagesCounterMainnet = web3.utils.toBN(await messageProxyForSchain.getOutgoingMessagesCounter("Mainnet"));
+        outgoingMessagesCounterMainnet.toString().should.be.deep.equal("1");
     });
 
     it("should rejected with `Not allowed ERC20 Token` when invoke `rawExitToMainERC20`", async () => {
         const error = "Not allowed ERC20 Token";
-        const amount = new BigNumber(200);
-        const amountTo = new BigNumber(20);
+        const amount = web3.utils.toBN(200);
+        const amountTo = web3.utils.toBN(20);
         //
         await lockAndDataForSchain.setContract("ERC20Module", eRC20ModuleForSchain.address, {from: deployer});
         await lockAndDataForSchain
@@ -331,18 +331,23 @@ contract("TokenManager", ([user, deployer, client]) => {
         await eRC20OnChain.addMinter(lockAndDataForSchainERC20.address, {from: deployer});
         //
         await lockAndDataForSchainERC20
-            .sendERC20(eRC20OnChain.address, user, amount, {from: deployer});
+            .sendERC20(eRC20OnChain.address, user, amount.toString(), {from: deployer});
         //
-        await eRC20OnChain.approve(tokenManager.address, amountTo, {from: user});
+        await eRC20OnChain.approve(tokenManager.address, amountTo.toString(), {from: user});
         // execution/expectation
-        await tokenManager.rawExitToMainERC20(eRC20OnChain.address, client, deployer, amountTo, {from: deployer})
-            .should.be.eventually.rejectedWith(error);
+        await tokenManager.rawExitToMainERC20(
+            eRC20OnChain.address,
+            client,
+            deployer,
+            amountTo.toString(),
+            {from: deployer},
+        ).should.be.eventually.rejectedWith(error);
     });
 
     it("should rejected with `Not enough gas sent` when invoke `rawExitToMainERC20`", async () => {
         const error = "Not enough gas sent";
-        const amount = new BigNumber(200);
-        const amountTo = new BigNumber(20);
+        const amount = web3.utils.toBN(200);
+        const amountTo = web3.utils.toBN(20);
         // set contract TokenManager:
         await lockAndDataForSchain.setContract("TokenManager", tokenManager.address, {from: deployer});
         await lockAndDataForSchain.setContract("ERC20Module", eRC20ModuleForSchain.address, {from: deployer});
@@ -350,19 +355,24 @@ contract("TokenManager", ([user, deployer, client]) => {
             .setContract("LockAndDataERC20", lockAndDataForSchainERC20.address, {from: deployer});
         // invoke `addMinter` before `sendERC20` to avoid `MinterRole: caller does not have the Minter role` exception
         await eRC20OnChain.addMinter(lockAndDataForSchainERC20.address, {from: deployer});
-        await eRC20OnChain.mint(deployer, amount, {from: deployer});
-        await eRC20OnChain.approve(tokenManager.address, amountTo, {from: deployer});
-        await tokenManager.rawExitToMainERC20(eRC20OnChain.address, client, deployer, amountTo, {from: deployer})
-            .should.be.eventually.rejectedWith(error);
+        await eRC20OnChain.mint(deployer, amount.toString(), {from: deployer});
+        await eRC20OnChain.approve(tokenManager.address, amountTo.toString(), {from: deployer});
+        await tokenManager.rawExitToMainERC20(
+            eRC20OnChain.address,
+            client,
+            deployer,
+            amountTo.toString(),
+            {from: deployer},
+        ).should.be.eventually.rejectedWith(error);
     });
 
-    it("should revert `Not allowed. in TokenManager`", async () => {
-        // preparation
-        const error = "Not allowed. in TokenManager";
-        // execution/expectation
-        await web3.eth.sendTransaction({from: deployer, to: tokenManager.address, value: "1000000000000000000"})
-            .should.be.eventually.rejectedWith(error);
-    });
+    // it("should revert `Not allowed. in TokenManager`", async () => {
+    //     // preparation
+    //     const error = "Not allowed. in TokenManager";
+    //     // execution/expectation
+    //     await web3.eth.sendTransaction({from: deployer, to: tokenManager.address, value: "1000000000000000000"})
+    //         .should.be.eventually.rejectedWith(error);
+    // });
 
     // it("should return money if it has it", async () => {
     //     const tokenManagerBalance = Number.parseInt(await web3.eth.getBalance(tokenManager.address), 10);
@@ -425,8 +435,8 @@ contract("TokenManager", ([user, deployer, client]) => {
             .rawExitToMainERC20(eRC20OnChain.address, client, deployer, amountReduceCoast, {from: deployer});
 
         // expectation:
-        const outgoingMessagesCounterMainnet = new BigNumber(await messageProxyForSchain.getOutgoingMessagesCounter("Mainnet"));
-        outgoingMessagesCounterMainnet.should.be.deep.equal(new BigNumber(1));
+        const outgoingMessagesCounterMainnet = web3.utils.toBN(await messageProxyForSchain.getOutgoingMessagesCounter("Mainnet"));
+        outgoingMessagesCounterMainnet.toString().should.be.deep.equal("1");
     });
 
     it("should rejected with `Not allowed ERC20 Token` when invoke `transferToSchainERC20`", async () => {
@@ -492,9 +502,9 @@ contract("TokenManager", ([user, deployer, client]) => {
         await tokenManager
             .transferToSchainERC20(chainID, eRC20OnChain.address, client, amountReduceCoast, {from: deployer});
         // expectation:
-        const outgoingMessagesCounterMainnet = new BigNumber(
-            await messageProxyForSchain.getOutgoingMessagesCounter(chainID));
-        outgoingMessagesCounterMainnet.should.be.deep.equal(new BigNumber(1));
+        const outgoingMessagesCounterMainnet = web3.utils.toBN(
+              await messageProxyForSchain.getOutgoingMessagesCounter(chainID));
+        outgoingMessagesCounterMainnet.toString().should.be.deep.equal("1");
     });
 
     it("should invoke `rawTransferToSchainERC20` without mistakes", async () => {
@@ -528,9 +538,9 @@ contract("TokenManager", ([user, deployer, client]) => {
             .rawTransferToSchainERC20(chainID, eRC20OnChain.address, eRC20OnChain.address,
                 client, amountReduceCoast, {from: deployer});
         // expectation:
-        const outgoingMessagesCounterMainnet = new BigNumber(
-            await messageProxyForSchain.getOutgoingMessagesCounter(chainID));
-        outgoingMessagesCounterMainnet.should.be.deep.equal(new BigNumber(1));
+        const outgoingMessagesCounterMainnet = web3.utils.toBN(
+             await messageProxyForSchain.getOutgoingMessagesCounter(chainID));
+        outgoingMessagesCounterMainnet.toString().should.be.deep.equal("1");
     });
 
     it("should rejected with `Not allowed ERC20 Token` when invoke `rawTransferToSchainERC20`", async () => {
@@ -668,9 +678,9 @@ contract("TokenManager", ([user, deployer, client]) => {
         const res = await tokenManager
             .exitToMainERC721(contractHere, to, tokenId, {from: deployer});
         // expectation:
-        const outgoingMessagesCounterMainnet = new BigNumber(await messageProxyForSchain
+        const outgoingMessagesCounterMainnet = web3.utils.toBN(await messageProxyForSchain
             .getOutgoingMessagesCounter("Mainnet"));
-        outgoingMessagesCounterMainnet.should.be.deep.equal(new BigNumber(1));
+        outgoingMessagesCounterMainnet.toString().should.be.deep.equal("1");
     });
 
     it("should invoke `rawExitToMainERC721` without mistakes", async () => {
@@ -708,9 +718,9 @@ contract("TokenManager", ([user, deployer, client]) => {
         const res = await tokenManager
             .rawExitToMainERC721(contractHere, contractThere, to, tokenId, {from: deployer});
         // expectation:
-        const outgoingMessagesCounterMainnet = new BigNumber(await messageProxyForSchain
+        const outgoingMessagesCounterMainnet = web3.utils.toBN(await messageProxyForSchain
             .getOutgoingMessagesCounter("Mainnet"));
-        outgoingMessagesCounterMainnet.should.be.deep.equal(new BigNumber(1));
+        outgoingMessagesCounterMainnet.toString().should.be.deep.equal("1");
     });
 
     it("should rejected with `Not allowed ERC721 Token` when invoke `rawExitToMainERC721`", async () => {
@@ -822,9 +832,9 @@ contract("TokenManager", ([user, deployer, client]) => {
         const res = await tokenManager
             .transferToSchainERC721(chainID, contractHere, to, tokenId, {from: deployer});
         // expectation:
-        const outgoingMessagesCounter = new BigNumber(await messageProxyForSchain
+        const outgoingMessagesCounter = web3.utils.toBN(await messageProxyForSchain
             .getOutgoingMessagesCounter(chainID));
-        outgoingMessagesCounter.should.be.deep.equal(new BigNumber(1));
+        outgoingMessagesCounter.toString().should.be.deep.equal("1");
     });
 
     it("should rejected with `Not allowed ERC721 Token` when invoke `transferToSchainERC721`", async () => {
@@ -900,9 +910,9 @@ contract("TokenManager", ([user, deployer, client]) => {
         const res = await tokenManager
             .rawTransferToSchainERC721(chainID, contractHere, contractThere, to, tokenId, {from: deployer});
         // expectation:
-        const outgoingMessagesCounter = new BigNumber(await messageProxyForSchain
+        const outgoingMessagesCounter = web3.utils.toBN(await messageProxyForSchain
             .getOutgoingMessagesCounter(chainID));
-        outgoingMessagesCounter.should.be.deep.equal(new BigNumber(1));
+        outgoingMessagesCounter.toString().should.be.deep.equal("1");
     });
 
     it("should rejected with `Not allowed ERC721 Token` when invoke `rawTransferToSchainERC721`", async () => {
@@ -1028,7 +1038,7 @@ contract("TokenManager", ([user, deployer, client]) => {
             await tokenManager
                 .postMessage(sender, schainID, to, amount, bytesData, {from: deployer});
             // expectation
-            expect(parseInt((new BigNumber(await ethERC20.balanceOf(to))).toString(), 10))
+            expect(parseInt((web3.utils.toBN(await ethERC20.balanceOf(to))).toString(), 10))
                 .to.be.equal(parseInt(amount, 10));
         });
 
@@ -1106,7 +1116,7 @@ contract("TokenManager", ([user, deployer, client]) => {
             await tokenManager
               .postMessage(sender, schainID, to0, amount, data, {from: deployer});
             // expectation
-            expect(parseInt((new BigNumber(await ethERC20.balanceOf(to))).toString(), 10))
+            expect(parseInt((web3.utils.toBN(await ethERC20.balanceOf(to))).toString(), 10))
                 .to.be.equal(amount);
         });
 
@@ -1154,7 +1164,7 @@ contract("TokenManager", ([user, deployer, client]) => {
             await tokenManager
               .postMessage(sender, schainID, to0, amount, data, {from: deployer});
             // expectation
-            expect(parseInt((new BigNumber(await ethERC20.balanceOf(to))).toString(), 10))
+            expect(parseInt((web3.utils.toBN(await ethERC20.balanceOf(to))).toString(), 10))
                 .to.be.equal(amount);
         });
 
@@ -1202,7 +1212,7 @@ contract("TokenManager", ([user, deployer, client]) => {
             await tokenManager
               .postMessage(sender, schainID, to0, amount, data, {from: deployer});
             // expectation
-            expect(parseInt((new BigNumber(await ethERC20.balanceOf(to))).toString(), 10))
+            expect(parseInt((web3.utils.toBN(await ethERC20.balanceOf(to))).toString(), 10))
                 .to.be.equal(amount);
         });
 
@@ -1253,7 +1263,7 @@ contract("TokenManager", ([user, deployer, client]) => {
             await tokenManager
               .postMessage(sender, schainID, to0, amount, data, {from: deployer});
             // expectation
-            expect(parseInt((new BigNumber(await ethERC20.balanceOf(to))).toString(), 10))
+            expect(parseInt((web3.utils.toBN(await ethERC20.balanceOf(to))).toString(), 10))
                 .to.be.equal(amount);
         });
     });

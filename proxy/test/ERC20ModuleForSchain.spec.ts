@@ -141,7 +141,7 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     await eRC20ModuleForSchain.sendERC20(to0, data, {from: deployer});
     // expectation
     const balance = await eRC20OnChain.balanceOf(to);
-    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(amount);
+    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(amount);
   });
 
   it("should return send ERC20 token twice", async () => {
@@ -185,7 +185,7 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     const newERC20Contract = new web3.eth.Contract(ABIERC20OnChain.abi, newAddress);
     await eRC20ModuleForSchain.sendERC20(to0, data2, {from: deployer});
     const balance = await newERC20Contract.methods.balanceOf(to).call();
-    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(amount * 2);
+    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(amount * 2);
   });
 
   it("should return `true` for `sendERC20` with `to0==address(0)` and `contractAddreess==address(0)`", async () => {
@@ -217,7 +217,7 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     // expectation
     const newERC20Contract = new web3.eth.Contract(ABIERC20OnChain.abi, newAddress);
     const balance = await newERC20Contract.methods.balanceOf(to).call();
-    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(amount);
+    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(amount);
   });
 
   it("should return `true` when invoke `sendERC20` with `to0==ethERC20.address`", async () => {
@@ -242,7 +242,7 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     const res = await eRC20ModuleForSchain.sendERC20(to0, data, {from: deployer});
     // expectation
     const balance = await eRC20OnChain2.balanceOf(to);
-    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(amount);
+    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(amount);
   });
 
   it("should return `receiver` when invoke `getReceiver` with `to0==ethERC20.address`", async () => {

@@ -133,9 +133,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
             await messageProxyForMainnet.addConnectedChain(chainID, publicKeyArray, {from: deployer});
             await messageProxyForMainnet
             .postOutgoingMessage(chainID, contractAddress, amount, addressTo, bytesData, {from: deployer});
-            const outgoingMessagesCounter = new BigNumber(
+            const outgoingMessagesCounter = web3.utils.toBN(
                 await messageProxyForMainnet.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter.should.be.deep.equal(new BigNumber(1));
+            outgoingMessagesCounter.toString().should.be.deep.equal("1");
         });
 
         it("should post incoming messages", async () => {
@@ -186,9 +186,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 counter,
                 {from: deployer},
             );
-            const incomingMessagesCounter = new BigNumber(
+            const incomingMessagesCounter = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter.should.be.deep.equal(new BigNumber(2));
+            incomingMessagesCounter.toString().should.be.deep.equal("2");
         });
 
         it("should get outgoing messages counter", async () => {
@@ -203,16 +203,16 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
 
             await messageProxyForMainnet.addConnectedChain(chainID, publicKeyArray, {from: deployer});
 
-            const outgoingMessagesCounter0 = new BigNumber(
+            const outgoingMessagesCounter0 = web3.utils.toBN(
                 await messageProxyForMainnet.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter0.should.be.deep.equal(new BigNumber(0));
+            outgoingMessagesCounter0.toString().should.be.deep.equal("0");
 
             await messageProxyForMainnet
             .postOutgoingMessage(chainID, contractAddress, amount, addressTo, bytesData, {from: deployer});
 
-            const outgoingMessagesCounter = new BigNumber(
+            const outgoingMessagesCounter = web3.utils.toBN(
                 await messageProxyForMainnet.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter.should.be.deep.equal(new BigNumber(1));
+            outgoingMessagesCounter.toString().should.be.deep.equal("1");
         });
 
         it("should get incoming messages counter", async () => {
@@ -239,9 +239,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
 
             await messageProxyForMainnet.addConnectedChain(chainID, publicKeyArray, {from: deployer});
 
-            const incomingMessagesCounter0 = new BigNumber(
+            const incomingMessagesCounter0 = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter0.should.be.deep.equal(new BigNumber(0));
+            incomingMessagesCounter0.toString().should.be.deep.equal("0");
 
             await messageProxyForMainnet
             .postIncomingMessages(
@@ -254,9 +254,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 counter,
                 {from: deployer},
             );
-            const incomingMessagesCounter = new BigNumber(
+            const incomingMessagesCounter = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter.should.be.deep.equal(new BigNumber(2));
+            incomingMessagesCounter.toString().should.be.deep.equal("2");
         });
 
         it("should move incoming counter", async () => {
@@ -266,18 +266,20 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
             isConnectedChain.should.be.deep.equal(Boolean(true));
 
             // chain can't be connected twice:
-            const incomingMessages = new BigNumber(
+            const incomingMessages = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID, {from: deployer}),
             );
 
             // main net does not have a public key and is implicitly connected:
             await messageProxyForMainnet.moveIncomingCounter(chainID, {from: deployer});
 
-            const newIncomingMessages = new BigNumber(
+            const newIncomingMessages = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID, {from: deployer}),
             );
 
-            newIncomingMessages.should.be.deep.equal(BigNumber.sum(incomingMessages, 1));
+            newIncomingMessages.toString().should.be.deep.equal(
+                BigNumber.sum(incomingMessages.toString(), 1).toString(),
+            );
         });
 
         it("should get incoming messages counter", async () => {
@@ -304,9 +306,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
 
             await messageProxyForMainnet.addConnectedChain(chainID, publicKeyArray, {from: deployer});
 
-            const incomingMessagesCounter0 = new BigNumber(
+            const incomingMessagesCounter0 = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter0.should.be.deep.equal(new BigNumber(0));
+            incomingMessagesCounter0.toString().should.be.deep.equal("0");
 
             await messageProxyForMainnet
             .postIncomingMessages(
@@ -319,17 +321,17 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 counter,
                 {from: deployer},
             );
-            const incomingMessagesCounter = new BigNumber(
+            const incomingMessagesCounter = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter.should.be.deep.equal(new BigNumber(2));
+            incomingMessagesCounter.toString().should.be.deep.equal("2");
 
             const amount = 5;
             const addressTo = client;
             const bytesData = "0x0";
 
-            const outgoingMessagesCounter0 = new BigNumber(
+            const outgoingMessagesCounter0 = web3.utils.toBN(
                 await messageProxyForMainnet.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter0.should.be.deep.equal(new BigNumber(0));
+            outgoingMessagesCounter0.toString().should.be.deep.equal("0");
 
             await messageProxyForMainnet.postOutgoingMessage(
                 chainID,
@@ -340,19 +342,19 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 {from: deployer},
             );
 
-            const outgoingMessagesCounter = new BigNumber(
+            const outgoingMessagesCounter = web3.utils.toBN(
                 await messageProxyForMainnet.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter.should.be.deep.equal(new BigNumber(1));
+            outgoingMessagesCounter.toString().should.be.deep.equal("1");
 
             await messageProxyForMainnet.setCountersToZero(chainID, {from: deployer});
 
-            const newIncomingMessagesCounter = new BigNumber(
+            const newIncomingMessagesCounter = web3.utils.toBN(
                 await messageProxyForMainnet.getIncomingMessagesCounter(chainID));
-            newIncomingMessagesCounter.should.be.deep.equal(new BigNumber(0));
+            newIncomingMessagesCounter.toString().should.be.deep.equal("0");
 
-            const newOutgoingMessagesCounter = new BigNumber
-                (await messageProxyForMainnet.getOutgoingMessagesCounter(chainID));
-            newOutgoingMessagesCounter.should.be.deep.equal(new BigNumber(0));
+            const newOutgoingMessagesCounter = web3.utils.toBN(
+                await messageProxyForMainnet.getOutgoingMessagesCounter(chainID));
+            newOutgoingMessagesCounter.toString().should.be.deep.equal("0");
         });
 
     });
@@ -423,9 +425,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
             await messageProxyForSchain.addConnectedChain(chainID, publicKeyArray, {from: deployer});
             await messageProxyForSchain
             .postOutgoingMessage(chainID, contractAddress, amount, addressTo, bytesData, {from: deployer});
-            const outgoingMessagesCounter = new BigNumber(
+            const outgoingMessagesCounter = web3.utils.toBN(
                 await messageProxyForSchain.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter.should.be.deep.equal(new BigNumber(1));
+            outgoingMessagesCounter.toString().should.be.deep.equal("1");
         });
 
         it("should post incoming messages", async () => {
@@ -471,9 +473,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 counter,
                 {from: deployer},
             );
-            const incomingMessagesCounter = new BigNumber(
+            const incomingMessagesCounter = web3.utils.toBN(
                 await messageProxyForSchain.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter.should.be.deep.equal(new BigNumber(2));
+            incomingMessagesCounter.toString().should.be.deep.equal("2");
         });
 
         it("should get outgoing messages counter", async () => {
@@ -488,16 +490,16 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
 
             await messageProxyForSchain.addConnectedChain(chainID, publicKeyArray, {from: deployer});
 
-            const outgoingMessagesCounter0 = new BigNumber(
+            const outgoingMessagesCounter0 = web3.utils.toBN(
                 await messageProxyForSchain.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter0.should.be.deep.equal(new BigNumber(0));
+            outgoingMessagesCounter0.toString().should.be.deep.equal("0");
 
             await messageProxyForSchain
             .postOutgoingMessage(chainID, contractAddress, amount, addressTo, bytesData, {from: deployer});
 
-            const outgoingMessagesCounter = new BigNumber(
+            const outgoingMessagesCounter = web3.utils.toBN(
                 await messageProxyForSchain.getOutgoingMessagesCounter(chainID));
-            outgoingMessagesCounter.should.be.deep.equal(new BigNumber(1));
+            outgoingMessagesCounter.toString().should.be.deep.equal("1");
         });
 
         it("should get incoming messages counter", async () => {
@@ -524,9 +526,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
 
             await messageProxyForSchain.addConnectedChain(chainID, publicKeyArray, {from: deployer});
 
-            const incomingMessagesCounter0 = new BigNumber(
+            const incomingMessagesCounter0 = web3.utils.toBN(
                 await messageProxyForSchain.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter0.should.be.deep.equal(new BigNumber(0));
+            incomingMessagesCounter0.toString().should.be.deep.equal("0");
 
             await messageProxyForSchain.postIncomingMessages(
                 chainID,
@@ -538,9 +540,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 counter,
                 {from: deployer},
             );
-            const incomingMessagesCounter = new BigNumber(
+            const incomingMessagesCounter = web3.utils.toBN(
                 await messageProxyForSchain.getIncomingMessagesCounter(chainID));
-            incomingMessagesCounter.should.be.deep.equal(new BigNumber(2));
+            incomingMessagesCounter.toString().should.be.deep.equal("2");
         });
 
         it("should rejected with `Sender is not an owner` when invoke `addAuthorizedCaller`", async () => {

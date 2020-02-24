@@ -88,7 +88,7 @@ contract("LockAndDataForMainnet", ([deployer, user, invoker]) => {
     await lockAndDataForMainnet
       .approveTransfer(deployer, sendWeiFromContract, {from: deployer});
     // get value from mapping `approveTransfers`
-    const bn = new BigNumber(await lockAndDataForMainnet.approveTransfers(deployer));
+    const bn = web3.utils.toBN(await lockAndDataForMainnet.approveTransfers(deployer));
     // expectation
     parseInt(bn.toString(), 10).should.be.equal(sendWeiFromContract);
   });

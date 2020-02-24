@@ -42,18 +42,18 @@ contract("LockAndDataForSchain", ([user, deployer]) => {
     const address = await lockAndDataForSchain.getEthERC20Address();
 
     // only owner can set contract:
-    await lockAndDataForSchain.setContract("EthERC20", address, {from: user})
+    await lockAndDataForSchain.setContract("EthERC20", address.toString(), {from: user})
     .should.be.rejected;
 
     // contract address shouldn't be equal zero:
-    await lockAndDataForSchain.setContract("EthERC20", nullAddress, {from: deployer})
+    await lockAndDataForSchain.setContract("EthERC20", nullAddress.toString(), {from: deployer})
     .should.be.rejectedWith("New address is equal zero");
 
     // set contract:
-    await lockAndDataForSchain.setContract("EthERC20", address, {from: deployer});
+    await lockAndDataForSchain.setContract("EthERC20", address.toString(), {from: deployer});
 
     // the same contract can't be set twice:
-    await lockAndDataForSchain.setContract("EthERC20", address, {from: deployer}).
+    await lockAndDataForSchain.setContract("EthERC20", address.toString(), {from: deployer}).
     should.be.rejectedWith("Contract is already added");
 
     // contract address should contain code:
@@ -111,47 +111,47 @@ contract("LockAndDataForSchain", ([user, deployer]) => {
 
   it("should add gas costs", async () => {
     const address = user;
-    const amount = new BigNumber(500);
+    const amount = web3.utils.toBN(500);
 
     // only owner can add gas costs:
-    await lockAndDataForSchain.addGasCosts(address, amount, {from: user}).should.be.rejected;
-    await lockAndDataForSchain.addGasCosts(address, amount, {from: deployer});
+    await lockAndDataForSchain.addGasCosts(address, amount.toString(), {from: user}).should.be.rejected;
+    await lockAndDataForSchain.addGasCosts(address, amount.toString(), {from: deployer});
 
-    const ethCosts = new BigNumber(await lockAndDataForSchain.ethCosts(user));
-    ethCosts.should.be.deep.equal(amount);
+    const ethCosts = web3.utils.toBN(await lockAndDataForSchain.ethCosts(user));
+    ethCosts.toString().should.be.equal(amount.toString());
   });
 
   it("should reduce gas costs", async () => {
     const address = user;
-    const amount = new BigNumber(500);
-    const amountReduce = new BigNumber(20);
-    const amountFinal = new BigNumber(480);
-    const amountZero = new BigNumber(0);
+    const amount = web3.utils.toBN(500);
+    const amountReduce = web3.utils.toBN(20);
+    const amountFinal = web3.utils.toBN(480);
+    const amountZero = web3.utils.toBN(0);
     const nullAddress = "0x0000000000000000000000000000000000000000";
 
     // only owner can add gas costs:
-    await lockAndDataForSchain.addGasCosts(address, amount, {from: user}).should.be.rejected;
+    await lockAndDataForSchain.addGasCosts(address, amount.toString(), {from: user}).should.be.rejected;
 
     // if address don't have gas costs reduceGasCosts function don't change situation any way:
-    const ethCostsBefore = new BigNumber(await lockAndDataForSchain.ethCosts(user));
-    ethCostsBefore.should.be.deep.equal(amountZero);
-    await lockAndDataForSchain.reduceGasCosts(address, amountReduce, {from: deployer});
-    const ethCostsAfter = new BigNumber(await lockAndDataForSchain.ethCosts(user));
-    ethCostsAfter.should.be.deep.equal(amountZero);
+    const ethCostsBefore = web3.utils.toBN(await lockAndDataForSchain.ethCosts(user));
+    ethCostsBefore.toString().should.be.deep.equal(amountZero.toString());
+    await lockAndDataForSchain.reduceGasCosts(address, amountReduce.toString(), {from: deployer});
+    const ethCostsAfter = web3.utils.toBN(await lockAndDataForSchain.ethCosts(user));
+    ethCostsAfter.toString().should.be.deep.equal(amountZero.toString());
 
     // we can add gas costs to null address and it uses when on address no gas costs:
-    await lockAndDataForSchain.addGasCosts(nullAddress, amount, {from: deployer});
-    await lockAndDataForSchain.reduceGasCosts(address, amountReduce, {from: deployer});
-    const ethCostsNullAddress = new BigNumber(await lockAndDataForSchain.ethCosts(nullAddress));
-    ethCostsNullAddress.should.be.deep.equal(amountFinal);
-    const ethCostsAddress = new BigNumber(await lockAndDataForSchain.ethCosts(address));
-    ethCostsAddress.should.be.deep.equal(amountZero);
+    await lockAndDataForSchain.addGasCosts(nullAddress, amount.toString(), {from: deployer});
+    await lockAndDataForSchain.reduceGasCosts(address, amountReduce.toString(), {from: deployer});
+    const ethCostsNullAddress = web3.utils.toBN(await lockAndDataForSchain.ethCosts(nullAddress));
+    ethCostsNullAddress.toString().should.be.deep.equal(amountFinal.toString());
+    const ethCostsAddress = web3.utils.toBN(await lockAndDataForSchain.ethCosts(address));
+    ethCostsAddress.toString().should.be.deep.equal(amountZero.toString());
 
     // reduce gas cost after adding it:
-    await lockAndDataForSchain.addGasCosts(address, amount, {from: deployer});
-    await lockAndDataForSchain.reduceGasCosts(address, amountReduce, {from: deployer});
-    const ethCosts = new BigNumber(await lockAndDataForSchain.ethCosts(nullAddress));
-    ethCosts.should.be.deep.equal(amountFinal);
+    await lockAndDataForSchain.addGasCosts(address, amount.toString(), {from: deployer});
+    await lockAndDataForSchain.reduceGasCosts(address, amountReduce.toString(), {from: deployer});
+    const ethCosts = web3.utils.toBN(await lockAndDataForSchain.ethCosts(nullAddress));
+    ethCosts.toString().should.be.deep.equal(amountFinal.toString());
   });
 
   it("should send Eth", async () => {
@@ -173,21 +173,21 @@ contract("LockAndDataForSchain", ([user, deployer]) => {
     await lockAndDataForSchain.sendEth(address, amountMoreThenCap, {from: deployer}).should.be.rejected;
 
     // balance of account  equal to zero:
-    const balanceBefore = parseInt(new BigNumber(await ethERC20.balanceOf(user)).toString(), 10);
-    balanceBefore.should.be.deep.equal(amountZero);
+    const balanceBefore = parseInt(web3.utils.toBN(await ethERC20.balanceOf(user)).toString(), 10);
+    balanceBefore.toString().should.be.deep.equal(amountZero.toString());
 
     // send Eth:
     await lockAndDataForSchain.sendEth(address, amount, {from: deployer});
 
     // balance of account equal to amount which has been sent:
-    const balanceAfter = parseInt(new BigNumber(await ethERC20.balanceOf(user)).toString(), 10);
-    balanceAfter.should.be.deep.equal(amount);
+    const balanceAfter = parseInt(web3.utils.toBN(await ethERC20.balanceOf(user)).toString(), 10);
+    balanceAfter.toString().should.be.deep.equal(amount.toString());
   });
 
   it("should receive Eth", async () => {
     const address = user;
-    const amount = new BigNumber(200);
-    const amountZero = new BigNumber(0);
+    const amount = web3.utils.toBN(200);
+    const amountZero = web3.utils.toBN(0);
 
     // set EthERC20 address:
     await lockAndDataForSchain.setEthERC20Address(ethERC20.address, {from: deployer});
@@ -196,18 +196,18 @@ contract("LockAndDataForSchain", ([user, deployer]) => {
     await ethERC20.transferOwnership(lockAndDataForSchain.address, {from: deployer});
 
     //  send Eth to account:
-    await lockAndDataForSchain.sendEth(address, amount, {from: deployer});
+    await lockAndDataForSchain.sendEth(address, amount.toString(), {from: deployer});
 
     // balance of account equal to amount which has been sent:
-    const balance = new BigNumber(await ethERC20.balanceOf(address));
-    balance.should.be.deep.equal(amount);
+    const balance = web3.utils.toBN(await ethERC20.balanceOf(address));
+    balance.toString().should.be.deep.equal(amount.toString());
 
     // burn Eth through `receiveEth` function:
-    await lockAndDataForSchain.receiveEth(address, amount, {from: deployer});
+    await lockAndDataForSchain.receiveEth(address, amount.toString(), {from: deployer});
 
     // balance after "receiving" equal to zero:
-    const balanceAfter = new BigNumber(await ethERC20.balanceOf(address));
-    balanceAfter.should.be.deep.equal(amountZero);
+    const balanceAfter = web3.utils.toBN(await ethERC20.balanceOf(address));
+    balanceAfter.toString().should.be.deep.equal(amountZero.toString());
   });
 
   it("should return true when invoke `hasSchain`", async () => {

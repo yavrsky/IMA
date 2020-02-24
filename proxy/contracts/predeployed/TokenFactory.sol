@@ -17,16 +17,61 @@
  *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 
 import "./PermissionsForSchain.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Capped.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/ERC721MetadataMintable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Capped.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Metadata.sol";
+import "@openzeppelin/contracts/access/Roles.sol";
+import "@openzeppelin/contracts/GSN/Context.sol";
 
 
-contract ERC20OnChain is ERC20Detailed, ERC20Mintable {
+contract MinterRole is Context {
+    using Roles for Roles.Role;
+
+    event MinterAdded(address indexed account);
+    event MinterRemoved(address indexed account);
+
+    Roles.Role private _minters;
+
+    constructor() public {
+        if (!isMinter(_msgSender())) {
+            _addMinter(_msgSender());
+        }
+    }
+
+    modifier onlyMinter() {
+        require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
+        _;
+    }
+
+    function isMinter(address account) public view returns (bool) {
+        return _minters.has(account);
+    }
+
+    function addMinter(address account) public onlyMinter {
+        _addMinter(account);
+    }
+
+    function renounceMinter() public {
+        _removeMinter(_msgSender());
+    }
+
+    function _addMinter(address account) internal {
+        _minters.add(account);
+        emit MinterAdded(account);
+    }
+
+    function _removeMinter(address account) internal {
+        _minters.remove(account);
+        emit MinterRemoved(account);
+    }
+}
+
+
+contract ERC20OnChain is ERC20Detailed, ERC20, MinterRole {
 
     uint private _totalSupplyOnMainnet;
 
@@ -63,14 +108,15 @@ contract ERC20OnChain is ERC20Detailed, ERC20Mintable {
         _burnFrom(account, amount);
     }
 
-    function _mint(address account, uint value) internal {
+    function mint(address account, uint value) external onlyMinter returns (bool) {
         require(totalSupply().add(value) <= _totalSupplyOnMainnet, "Total supply on mainnet exceeded");
-        super._mint(account, value);
+        _mint(account, value);
+        return true;
     }
 }
 
 
-contract ERC721OnChain is ERC721Full, ERC721MetadataMintable {
+contract ERC721OnChain is ERC721Full, MinterRole {
     constructor(
         string memory contractName,
         string memory contractSymbol

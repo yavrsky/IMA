@@ -604,10 +604,13 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       await depositBox
         .postMessage(sender, schainID, user, amount, bytesData, {from: deployer});
       // get constants
-      const gasAmountPostMessage = parseInt((new BigNumber(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(), 10);
-      const averageTxPrise = parseInt((new BigNumber(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
+      const gasAmountPostMessage = parseInt(
+        (web3.utils.toBN(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(),
+        10,
+      );
+      const averageTxPrise = parseInt((web3.utils.toBN(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
       // expectation
-      const bn = new BigNumber(await lockAndDataForMainnet.approveTransfers(user));
+      const bn = web3.utils.toBN(await lockAndDataForMainnet.approveTransfers(user));
       parseInt(bn.toString(), 10).should.be.
         equal(parseInt(amount.toString(), 10) - gasAmountPostMessage * averageTxPrise);
     });
@@ -661,10 +664,13 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       await depositBox
         .postMessage(sender, schainID, to0, amount0, data, {from: deployer});
       // get constants
-      const gasAmountPostMessage = parseInt((new BigNumber(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(), 10);
-      const averageTxPrise = parseInt((new BigNumber(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
+      const gasAmountPostMessage = parseInt(
+        (web3.utils.toBN(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(),
+        10,
+      );
+      const averageTxPrise = parseInt((web3.utils.toBN(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
       // expectation
-      const bn = new BigNumber(await lockAndDataForMainnet.approveTransfers(user));
+      const bn = web3.utils.toBN(await lockAndDataForMainnet.approveTransfers(user));
       parseInt(bn.toString(), 10).should.be.
         equal(parseInt(amount0.toString(), 10) - gasAmountPostMessage * averageTxPrise);
     });
@@ -718,10 +724,13 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       await depositBox
         .postMessage(sender, schainID, to0, amount0, data, {from: deployer});
       // get constants
-      const gasAmountPostMessage = parseInt((new BigNumber(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(), 10);
-      const averageTxPrise = parseInt((new BigNumber(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
+      const gasAmountPostMessage = parseInt(
+        (web3.utils.toBN(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(),
+        10,
+      );
+      const averageTxPrise = parseInt((web3.utils.toBN(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
       // expectation
-      const bn = new BigNumber(await lockAndDataForMainnet.approveTransfers(user));
+      const bn = web3.utils.toBN(await lockAndDataForMainnet.approveTransfers(user));
       parseInt(bn.toString(), 10).should.be.
         equal(parseInt(amount0.toString(), 10) - gasAmountPostMessage * averageTxPrise);
     });
@@ -771,10 +780,13 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       await depositBox
         .postMessage(sender, schainID, to0, amount0, data, {from: deployer});
       // get constants
-      const gasAmountPostMessage = parseInt((new BigNumber(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(), 10);
-      const averageTxPrise = parseInt((new BigNumber(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
+      const gasAmountPostMessage = parseInt(
+        (web3.utils.toBN(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(),
+        10,
+      );
+      const averageTxPrise = parseInt((web3.utils.toBN(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
       // expectation
-      const bn = new BigNumber(await lockAndDataForMainnet.approveTransfers(user));
+      const bn = web3.utils.toBN(await lockAndDataForMainnet.approveTransfers(user));
       parseInt(bn.toString(), 10).should.be.
         equal(parseInt(amount0.toString(), 10) - gasAmountPostMessage * averageTxPrise);
     });
@@ -824,10 +836,13 @@ contract("DepositBox", ([deployer, user, invoker]) => {
       await depositBox
         .postMessage(sender, schainID, to0, amount0, data, {from: deployer});
       // get constants
-      const gasAmountPostMessage = parseInt((new BigNumber(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(), 10);
-      const averageTxPrise = parseInt((new BigNumber(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
+      const gasAmountPostMessage = parseInt(
+        (web3.utils.toBN(await depositBox.GAS_AMOUNT_POST_MESSAGE())).toString(),
+        10,
+      );
+      const averageTxPrise = parseInt((web3.utils.toBN(await depositBox.AVERAGE_TX_PRICE())).toString(), 10);
       // expectation
-      const bn = new BigNumber(await lockAndDataForMainnet.approveTransfers(user));
+      const bn = web3.utils.toBN(await lockAndDataForMainnet.approveTransfers(user));
       parseInt(bn.toString(), 10).should.be.
         equal(parseInt(amount0.toString(), 10) - gasAmountPostMessage * averageTxPrise);
     });

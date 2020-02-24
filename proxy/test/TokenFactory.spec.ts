@@ -119,7 +119,7 @@ contract("ERC20OnChain", ([user, deployer]) => {
     // execution
     const totalSupply = await eRC20OnChain.totalSupplyOnMainnet({from: deployer});
     // expectation
-    parseInt(new BigNumber(totalSupply).toString(), 10).should.be.equal(1000000000);
+    parseInt(web3.utils.toBN(totalSupply).toString(), 10).should.be.equal(1000000000);
   });
 
   it("should rejected with `Call does not go from ERC20Module` when invoke `setTotalSupplyOnMainnet`", async () => {
@@ -138,7 +138,7 @@ contract("ERC20OnChain", ([user, deployer]) => {
     await eRC20OnChain.setTotalSupplyOnMainnet(newTotalSupply, {from: deployer});
     // expectation
     const totalSupply = await eRC20OnChain.totalSupplyOnMainnet({from: deployer});
-    parseInt(new BigNumber(totalSupply).toString(), 10).should.be.equal(newTotalSupply);
+    parseInt(web3.utils.toBN(totalSupply).toString(), 10).should.be.equal(newTotalSupply);
   });
 
   it("should invoke `_mint` as internal", async () => {
@@ -149,7 +149,7 @@ contract("ERC20OnChain", ([user, deployer]) => {
     await eRC20OnChain.mint(account, value, {from: deployer});
     // expectation
     const balance = await eRC20OnChain.balanceOf(account);
-    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(value);
+    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(value);
   });
 
   it("should invoke `burn`", async () => {
@@ -162,7 +162,7 @@ contract("ERC20OnChain", ([user, deployer]) => {
     await eRC20OnChain.burn(amount, {from: deployer});
     // expectation
     const balance = await eRC20OnChain.balanceOf(deployer);
-    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(mintAmount - amount);
+    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(mintAmount - amount);
   });
 
   it("should invoke `burnFrom`", async () => {
@@ -178,7 +178,7 @@ contract("ERC20OnChain", ([user, deployer]) => {
     await eRC20OnChain.burnFrom(account, amount, {from: deployer});
     // expectation
     const balance = await eRC20OnChain.balanceOf(account);
-    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(mintAmount - amount);
+    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(mintAmount - amount);
   });
 });
 

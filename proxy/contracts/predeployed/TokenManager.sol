@@ -17,14 +17,14 @@
  *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.0;
 
 import "./PermissionsForSchain.sol";
 import "./../interfaces/IMessageProxy.sol";
 import "./../interfaces/IERC20Module.sol";
 import "./../interfaces/IERC721Module.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-solidity/contracts/token/ERC721/IERC721Full.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Full.sol";
 
 interface ILockAndDataTM {
     function setContract(string calldata contractName, address newContract) external;
@@ -106,9 +106,9 @@ contract TokenManager is PermissionsForSchain {
         chainID_ = newChainID;
     }
 
-    function() external payable {
-        revert("Not allowed. in TokenManager");
-    }
+    // receive() external payable {
+    //     revert("Not allowed. in TokenManager");
+    // }
 
     // function withdraw() external {
     //     if (msg.sender == owner) {
