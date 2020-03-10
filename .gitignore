@@ -65,6 +65,7 @@ proxy/data/*.json
 test/working
 test/config.json
 
+<<<<<<< HEAD
 .vscode
 
 functional_check/s_chain_gen/node_??
@@ -82,3 +83,12 @@ functional_check/engine/create_pems/k.key
 functional_check/engine/create_pems/k.pem
 functional_check/engine/create_pems/serial
 functional_check/engine/create_pems/sign_resilt.json
+=======
+
+.vscode
+functional_check/engine/package-lock.json
+functional_check/s_chain_gen/node_??
+functional_check/s_chain_gen/package-lock.json
+functional_check/skale-manager
+package-lock.json
+>>>>>>> origin/develop

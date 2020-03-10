@@ -19,7 +19,7 @@
 
 pragma solidity ^0.5.3;
 
-import "./Permissions.sol";
+import "./PermissionsForSchain.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Capped.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol";
@@ -28,7 +28,7 @@ import "openzeppelin-solidity/contracts/token/ERC721/ERC721MetadataMintable.sol"
 
 contract ERC20OnChain is ERC20Detailed, ERC20Mintable {
 
-    uint private _totalSupplyOnMainnet;
+    uint256 private _totalSupplyOnMainnet;
 
     address private addressOfErc20Module;
 
@@ -46,11 +46,11 @@ contract ERC20OnChain is ERC20Detailed, ERC20Mintable {
         addressOfErc20Module = erc20Module;
     }
 
-    function totalSupplyOnMainnet() external view returns (uint) {
+    function totalSupplyOnMainnet() external view returns (uint256) {
         return _totalSupplyOnMainnet;
     }
 
-    function setTotalSupplyOnMainnet(uint newTotalSupply) external {
+    function setTotalSupplyOnMainnet(uint256 newTotalSupply) external {
         require(addressOfErc20Module == msg.sender, "Call does not go from ERC20Module");
         _totalSupplyOnMainnet = newTotalSupply;
     }
@@ -63,7 +63,7 @@ contract ERC20OnChain is ERC20Detailed, ERC20Mintable {
         _burnFrom(account, amount);
     }
 
-    function _mint(address account, uint value) internal {
+    function _mint(address account, uint256 value) internal {
         require(totalSupply().add(value) <= _totalSupplyOnMainnet, "Total supply on mainnet exceeded");
         super._mint(account, value);
     }
@@ -107,9 +107,10 @@ contract ERC721OnChain is ERC721Full, ERC721MetadataMintable {
 }
 
 
-contract TokenFactory is Permissions {
+contract TokenFactory is PermissionsForSchain {
 
-    constructor(address _lockAndDataAddress) Permissions(_lockAndDataAddress) public {
+
+    constructor(address _lockAndDataAddress) PermissionsForSchain(_lockAndDataAddress) public {
         // solium-disable-previous-line no-empty-blocks
     }
 
@@ -123,7 +124,7 @@ contract TokenFactory is Permissions {
         uint8 decimals;
         uint256 totalSupply;
         (name, symbol, decimals, totalSupply) = fallbackDataCreateERC20Parser(data);
-        address erc20ModuleAddress = IContractManager(lockAndDataAddress).permitted(keccak256(abi.encodePacked("ERC20Module")));
+        address erc20ModuleAddress = IContractManagerForSchain(getLockAndDataAddress()).permitted(keccak256(abi.encodePacked("ERC20Module")));
         ERC20OnChain newERC20 = new ERC20OnChain(
             name,
             symbol,
@@ -131,7 +132,7 @@ contract TokenFactory is Permissions {
             totalSupply,
             erc20ModuleAddress
         );
-        address lockAndDataERC20 = IContractManager(lockAndDataAddress).permitted(keccak256(abi.encodePacked("LockAndDataERC20")));
+        address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).permitted(keccak256(abi.encodePacked("LockAndDataERC20")));
         newERC20.addMinter(lockAndDataERC20);
         newERC20.renounceMinter();
         return address(newERC20);
@@ -146,7 +147,8 @@ contract TokenFactory is Permissions {
         string memory symbol;
         (name, symbol) = fallbackDataCreateERC721Parser(data);
         ERC721OnChain newERC721 = new ERC721OnChain(name, symbol);
-        address lockAndDataERC721 = IContractManager(lockAndDataAddress).permitted(keccak256(abi.encodePacked("LockAndDataERC721")));
+        address lockAndDataERC721 = IContractManagerForSchain(getLockAndDataAddress()).
+            permitted(keccak256(abi.encodePacked("LockAndDataERC721")));
         newERC721.addMinter(lockAndDataERC721);
         newERC721.renounceMinter();
         return address(newERC721);
@@ -170,20 +172,20 @@ contract TokenFactory is Permissions {
         assembly {
             nameLength := mload(add(data, 129))
         }
-        name = new string(uint(nameLength));
-        for (uint i = 0; i < uint(nameLength); i++) {
+        name = new string(uint256(nameLength));
+        for (uint256 i = 0; i < uint256(nameLength); i++) {
             bytes(name)[i] = data[129 + i];
         }
-        uint lengthOfName = uint(nameLength);
+        uint256 lengthOfName = uint256(nameLength);
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             symbolLength := mload(add(data, add(161, lengthOfName)))
         }
-        symbol = new string(uint(symbolLength));
-        for (uint i = 0; i < uint(symbolLength); i++) {
+        symbol = new string(uint256(symbolLength));
+        for (uint256 i = 0; i < uint256(symbolLength); i++) {
             bytes(symbol)[i] = data[161 + lengthOfName + i];
         }
-        uint lengthOfSymbol = uint(symbolLength);
+        uint256 lengthOfSymbol = uint256(symbolLength);
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             decimals := mload(add(data,
@@ -213,18 +215,23 @@ contract TokenFactory is Permissions {
         assembly {
             nameLength := mload(add(data, 129))
         }
-        name = new string(uint(nameLength));
-        for (uint i = 0; i < uint(nameLength); i++) {
+        name = new string(uint256(nameLength));
+        for (uint256 i = 0; i < uint256(nameLength); i++) {
             bytes(name)[i] = data[129 + i];
         }
-        uint lengthOfName = uint(nameLength);
+        uint256 lengthOfName = uint256(nameLength);
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             symbolLength := mload(add(data, add(161, lengthOfName)))
         }
-        symbol = new string(uint(symbolLength));
-        for (uint i = 0; i < uint(symbolLength); i++) {
+        symbol = new string(uint256(symbolLength));
+        for (uint256 i = 0; i < uint256(symbolLength); i++) {
             bytes(symbol)[i] = data[161 + lengthOfName + i];
         }
     }
 }
+
+
+
+
+

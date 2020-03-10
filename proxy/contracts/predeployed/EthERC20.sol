@@ -21,28 +21,66 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-import "./Ownable.sol";
+import "./OwnableForSchain.sol";
 
 
-contract EthERC20 is Ownable, ERC20Detailed, ERC20 {
+/*
+// l_sergiy: new contract - LockAndDataOwnable - because owner should be lockAndDataAddress
+*/
+import "./LockAndDataOwnable.sol";
 
-    uint private constant CAP = 120 * (10 ** 6) * (10 ** 18);
 
-    constructor() ERC20Detailed("ERC20 Ether Clone", "ETHC", 18) public {
-        // solium-disable-previous-line no-empty-blocks
+contract EthERC20 is LockAndDataOwnable, ERC20 {
+
+    bool private _initialized = false;
+    string private _name;
+    string private _symbol;
+    uint8 private _decimals;
+    uint256 private _capacity;
+
+
+    constructor() public {
+        delayedInit();
     }
 
     function mint(address account, uint256 amount) external onlyOwner returns (bool) {
-        require(totalSupply().add(amount) <= CAP, "Cap exceeded");
+        delayedInit();
+        require(totalSupply().add(amount) <= _capacity, "Capacity exceeded");
         _mint(account, amount);
         return true;
     }
 
     function burn(uint256 amount) external {
+        delayedInit();
         _burn(msg.sender, amount);
     }
 
     function burnFrom(address account, uint256 amount) external onlyOwner {
+        delayedInit();
         _burn(account, amount);
     }
+
+    function name() public view returns (string memory) {
+        return _name;
+    }
+
+    function symbol() public view returns (string memory) {
+        return _symbol;
+    }
+
+    function decimals() public view returns (uint8) {
+        return _decimals;
+    }
+
+    function delayedInit() internal {
+        if (_initialized) {
+            return;
+        }
+        _initialized = true;
+        _name = "ERC20 Ether Clone";
+        _symbol = "ETHC";
+        _decimals = 18;
+        _capacity = 120 * (10 ** 6) * (10 ** 18);
+    }
+
 }

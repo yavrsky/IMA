@@ -1,5 +1,5 @@
 /**
- *   Permissions.sol - SKALE Interchain Messaging Agent
+ *   PermissionsForMainnet.sol - SKALE Interchain Messaging Agent
  *   Copyright (C) 2019-Present SKALE Labs
  *   @author Artem Payvin
  *
@@ -19,21 +19,33 @@
 
 pragma solidity ^0.5.3;
 
-import "./Ownable.sol";
+import "./OwnableForMainnet.sol";
 
-interface IContractManager {
+interface IContractManagerForMainnet {
     function permitted(bytes32 contractName) external view returns (address);
 }
 
 
 /**
- * @title Permissions - connected module for Upgradeable approach, knows ContractManager
+ * @title PermissionsForMainnet - connected module for Upgradeable approach, knows ContractManager
  * @author Artem Payvin
  */
-contract Permissions is Ownable {
+contract PermissionsForMainnet is OwnableForMainnet {
 
     // address of ContractManager
-    address lockAndDataAddress;
+    address public lockAndDataAddress_; // l_sergiy: changed name _
+
+    /**
+     * @dev constructor - sets current address of ContractManager
+     * @param newContractsAddress - current address of ContractManager
+     */
+    constructor(address newContractsAddress) public {
+        lockAndDataAddress_ = newContractsAddress;
+    }
+
+    function getLockAndDataAddress() public view returns ( address a ) {
+        return lockAndDataAddress_;
+    }
 
     /**
      * @dev allow - throws if called by any account and contract other than the owner
@@ -42,17 +54,10 @@ contract Permissions is Ownable {
      */
     modifier allow(string memory contractName) {
         require(
-            IContractManager(lockAndDataAddress).permitted(keccak256(abi.encodePacked(contractName))) == msg.sender ||
-            owner == msg.sender, "Message sender is invalid"
+            IContractManagerForMainnet(lockAndDataAddress_).permitted(keccak256(abi.encodePacked(contractName))) == msg.sender ||
+            getOwner() == msg.sender, "Message sender is invalid"
         );
         _;
     }
 
-    /**
-     * @dev constructor - sets current address of ContractManager
-     * @param newContractsAddress - current address of ContractManager
-     */
-    constructor(address newContractsAddress) public {
-        lockAndDataAddress = newContractsAddress;
-    }
 }

@@ -19,48 +19,55 @@
 
 pragma solidity ^0.5.3;
 
-import "./Ownable.sol";
+import "./OwnableForSchain.sol";
 
 interface IETHERC20 {
-    function allowance(address from, address to) external returns (uint);
+    function allowance(address from, address to) external returns (uint256);
     function mint(address account, uint256 amount) external returns (bool);
     function burn(uint256 amount) external;
     function burnFrom(address from, uint256 amount) external;
 }
 
 
-contract LockAndDataForSchain is Ownable {
+contract LockAndDataForSchain is OwnableForSchain {
 
-    address public ethERC20Address;
+    address private ethERC20Address_; // l_sergiy: changed name _
 
-    mapping(bytes32 => address) public permitted;
+    mapping(bytes32 => address) public permitted; // l_sergiy: changed name _
 
     mapping(bytes32 => address) public tokenManagerAddresses;
 
-    mapping(address => uint) public ethCosts;
+    mapping(address => uint256) public ethCosts;
 
     mapping(address => bool) public authorizedCaller;
 
+    bool private isCustomDeploymentMode_ = false;
+
     modifier allow(string memory contractName) {
         require(
-            permitted[keccak256(abi.encodePacked(contractName))] == msg.sender ||
-            owner == msg.sender, "Not allowed LockAndDataForSchain");
+            //permitted[keccak256(abi.encodePacked(contractName))] == msg.sender ||
+            checkPermitted(contractName,msg.sender) ||
+            getOwner() == msg.sender, "Not allowed LockAndDataForSchain");
         _;
     }
 
     constructor() public {
+        isCustomDeploymentMode_ = true;
         authorizedCaller[msg.sender] = true;
     }
 
     function setEthERC20Address(address newEthERC20Address) external onlyOwner {
-        ethERC20Address = newEthERC20Address;
+        ethERC20Address_ = newEthERC20Address;
     }
 
     function setContract(string calldata contractName, address newContract) external onlyOwner {
         require(newContract != address(0), "New address is equal zero");
+
         bytes32 contractId = keccak256(abi.encodePacked(contractName));
-        require(permitted[contractId] != newContract, "Contract is already added");
-        uint length;
+        //require(permitted[contractId] != newContract, "Contract is already added");
+        require(!checkPermitted(contractName,newContract), "Contract is already added"); // l_sergiy: repacement
+
+        uint256 length;
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             length := extcodesize(newContract)
@@ -78,7 +85,7 @@ contract LockAndDataForSchain is Ownable {
     }
 
     function addSchain(string calldata schainID, address tokenManagerAddress) external {
-        require(authorizedCaller[msg.sender], "Not authorized caller");
+        require(authorizedCaller[msg.sender] || getOwner() == msg.sender, "Not authorized caller");
         bytes32 schainHash = keccak256(abi.encodePacked(schainID));
         require(tokenManagerAddresses[schainHash] == address(0), "SKALE chain is already set");
         require(tokenManagerAddress != address(0), "Incorrect Token Manager address");
@@ -100,7 +107,7 @@ contract LockAndDataForSchain is Ownable {
     }
 
     function addDepositBox(address depositBoxAddress) external {
-        require(authorizedCaller[msg.sender], "Not authorized caller");
+        require(authorizedCaller[msg.sender] || getOwner() == msg.sender, "Not authorized caller");
         require(depositBoxAddress != address(0), "Incorrect Deposit Box address");
         require(
             tokenManagerAddresses[
@@ -131,11 +138,11 @@ contract LockAndDataForSchain is Ownable {
         authorizedCaller[caller] = false;
     }
 
-    function addGasCosts(address to, uint amount) external allow("TokenManager") {
+    function addGasCosts(address to, uint256 amount) external allow("TokenManager") {
         ethCosts[to] += amount;
     }
 
-    function reduceGasCosts(address to, uint amount) external allow("TokenManager") returns (bool) {
+    function reduceGasCosts(address to, uint256 amount) external allow("TokenManager") returns (bool) {
         if (ethCosts[to] >= amount) {
             ethCosts[to] -= amount;
             return true;
@@ -146,18 +153,51 @@ contract LockAndDataForSchain is Ownable {
         return false;
     }
 
-    function removeGasCosts(address to) external allow("TokenManager") returns (uint balance) {
+    function removeGasCosts(address to) external allow("TokenManager") returns (uint256 balance) {
         balance = ethCosts[to];
         delete ethCosts[to];
     }
 
-    function sendEth(address to, uint amount) external allow("TokenManager") returns (bool) {
-        require(IETHERC20(ethERC20Address).mint(to, amount), "Mint error");
+    function sendEth(address to, uint256 amount) external allow("TokenManager") returns (bool) {
+        require(IETHERC20(getEthERC20Address()).mint(to, amount), "Mint error");
         return true;
     }
 
-    function receiveEth(address sender, uint amount) external allow("TokenManager") returns (bool) {
-        IETHERC20(ethERC20Address).burnFrom(sender, amount);
+    function receiveEth(address sender, uint256 amount) external allow("TokenManager") returns (bool) {
+        IETHERC20(getEthERC20Address()).burnFrom(sender, amount);
         return true;
     }
+
+    function getEthERC20Address() /*external onlyOwner*/ /*private*/ public view returns ( address a ) {
+        if (ethERC20Address_ == address(0) && (!isCustomDeploymentMode_)) {
+            return SkaleFeatures(0x00c033b369416c9ecd8e4a07aafa8b06b4107419e2).getConfigVariableAddress("skaleConfig.contractSettings.IMA.ethERC20Address");
+        }
+        a = ethERC20Address_;
+    }
+
+    // l_sergiy: added checkPermitted() function
+    function checkPermitted( string memory contractName, address contractAddress ) private view returns ( bool rv ) {
+        require(contractAddress != address(0), "contract address required to check permitted status");
+        bytes32 contractId = keccak256(abi.encodePacked(contractName));
+        bool isPermitted = (permitted[contractId] == contractAddress) ? true : false;
+        if ((isPermitted) ) {
+            rv = true;
+        } else {
+            if (!isCustomDeploymentMode_) {
+                string memory strVarName = SkaleFeatures(0x00c033b369416c9ecd8e4a07aafa8b06b4107419e2).concatenateStrings("skaleConfig.contractSettings.IMA.variables.LockAndDataForSchain.permitted.", contractName);
+                address a = SkaleFeatures(0x00c033b369416c9ecd8e4a07aafa8b06b4107419e2).getConfigVariableAddress(strVarName);
+                if (a == contractAddress) {
+                    rv = true;
+                } else {
+                    rv = false;
+                }
+            } else {
+                rv = false;
+            }
+        }
+    }
+
 }
+
+
+

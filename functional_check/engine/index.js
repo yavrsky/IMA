@@ -26,6 +26,7 @@ let g_bVerbose = true;
 let g_bExternalMN = true; // set to true to run Min Net manually outside this test
 let g_bExternalSC = true; // set to true to run S-Chain manually outside this test
 let g_bExternalIMA = false; // set to true to run S-Chain manually outside this test
+let g_bPredeployedIMA = false;
 let g_bAskExternalStartStopMN = false;
 let g_bAskExternalStartStopSC = false;
 let g_bAskExternalStartStopIMA = false;
@@ -130,11 +131,24 @@ let g_strFolderImaProxy = g_strFolderRepoIMA + "/proxy";
 let g_strFolderImaAgent = g_strFolderRepoIMA + "/agent";
 // IMA ABIs    
 let g_strPathImaAbiMN = g_strFolderImaProxy + "/data/proxyMainnet.json";
+<<<<<<< HEAD
 let g_strPathImaAbiSC = g_strFolderImaProxy + "/data/proxySchain_" + g_strSChainName + ".json";
 
 let g_arrNodeDescriptions = [
     initNodeDescription( "http://127.0.0.1:15000", 0, 1112 ), // same as cat "Aldo"
     initNodeDescription( "http://127.0.0.2:15100", 1, 1113 ) // same as cat "Bear"
+=======
+let g_strPathImaAbiSC = g_bPredeployedIMA
+    ? g_strFolderImaProxy + "/data/precompiled.json.file"
+    : g_strFolderImaProxy + "/data/proxySchain_" + g_strSChainName + ".json"
+    ;
+
+let g_strFolderAppCache = g_strFolderRepoIMA + "/functional_check/app_cache";
+
+let g_arrNodeDescriptions = [
+    initNodeDescription( "http://127.0.0.1:15000", 0, 1112 ) // same as cat "Aldo"
+    , initNodeDescription( "http://127.0.0.2:15100", 1, 1113 ) // same as cat "Bear"
+>>>>>>> origin/develop
 ];
 let g_joChainEventInfoSM = null;
 let g_arrAssignedNodeIndices = [];
@@ -382,6 +396,14 @@ function compose_node_runCmd4imaAgent( joNodeDesc ) {
         + " --abi-s-chain=" + g_strPathImaAbiSC
         + " --key-main-net=" + g_strPrivateKeyImaMN // keys
         + " --key-s-chain=" + g_strPrivateKeyImaSC
+<<<<<<< HEAD
+=======
+        //
+        + " --sign-messages"
+        + " --bls-glue=" + g_strFolderAppCache + "/bin/bls_glue"
+        + " --hash-g1=" + g_strFolderAppCache + "/bin/hash_g1"
+        + " --bls-verify=" + g_strFolderAppCache + "/bin/verify_bls"
+>>>>>>> origin/develop
         // transfer loop parameters
         + " --m2s-transfer-block-size=" + 10 // .......Number of transactions in one block to use in money transfer loop from Main-net to S-chain
         + " --s2m-transfer-block-size=" + 10 // .......Number of transactions in one block to use in money transfer loop from S-chain to Main-net
@@ -397,7 +419,11 @@ function compose_node_runCmd4imaAgent( joNodeDesc ) {
         + " --nodes-count=" + g_arrNodeDescriptions.length // ....................S-Chain nodes count
         + " --time-framing=" + 60 // ..................Specifies period(in seconds) for time framing. Zero means disable time framing
         + " --time-gap=" + 10 // ......................Specifies gap(in seconds) before next time frame
+<<<<<<< HEAD
         ;
+=======
+    ;
+>>>>>>> origin/develop
     return "" + joNodeDesc.runCmd4imaAgent;
 }
 
@@ -1118,7 +1144,11 @@ function sgx_do_verify_secret( w3, joNodeDescA, joNodeDescB, joCall ) {
         log.write( "    " + cc.normal( "Using slaves entire " ) + cc.attention( "secretKeyContribution" ) + cc.normal( "=" ) + cc.info( entire_ss ) + "\n" );
     }
     joCall.call( {
+<<<<<<< HEAD
         "method": "DKGVerification",
+=======
+        "method": "DKGVerification", // old - "DKGVerification", new - "dkgVerification"
+>>>>>>> origin/develop
         "params": {
             "publicShares": vvs,
             "EthKeyName": ekn,
@@ -1277,7 +1307,11 @@ function sgx_create_node_bls_private_key( joNodeDesc, joCall ) {
         log.write( "    " + cc.normal( "Using " ) + cc.attention( "SecretShare" ) + cc.normal( "=" ) + cc.info( ss ) + "\n" );
     }
     joCall.call( {
+<<<<<<< HEAD
         "method": "CreateBLSPrivateKey",
+=======
+        "method": "CreateBLSPrivateKey", // old - "CreateBLSPrivateKey", new - "createBLSPrivateKey"
+>>>>>>> origin/develop
         "params": {
             "BLSKeyName": joNodeDesc.nameBlsPrivateKey,
             "EthKeyName": joNodeDesc.nameEcdsaPubKey,
@@ -1309,7 +1343,11 @@ function sgx_fetch_node_public_key( joNodeDesc, joCall ) {
             cc.bright( "..." ) +
             "\n\n" );
     joCall.call( {
+<<<<<<< HEAD
         "method": "GetBLSPublicKeyShare",
+=======
+        "method": "GetBLSPublicKeyShare", // old - "GetBLSPublicKeyShare", new - "getBLSPublicKeyShare"
+>>>>>>> origin/develop
         "params": {
             "BLSKeyName": joNodeDesc.nameBlsPrivateKey
         }
@@ -1630,6 +1668,11 @@ function perform_multi_node_deployment() {
         joNodeDesc.joConfig.skaleConfig.nodeInfo.imaMainNet = g_strMainNetURL;
         // joNodeDesc.joConfig.skaleConfig.nodeInfo.imaMessageProxySChain
         // joNodeDesc.joConfig.skaleConfig.nodeInfo.imaMessageProxyMainNet
+<<<<<<< HEAD
+=======
+        joNodeDesc.joConfig.skaleConfig.nodeInfo.imaCallerAddressSChain = "0x66c5a87f4a49DD75e970055A265E8dd5C3F8f852";
+        joNodeDesc.joConfig.skaleConfig.nodeInfo.imaCallerAddressMainNet = "0x7aa5e36aa15e93d10f4f26357c30f052dacdde5f";
+>>>>>>> origin/develop
         joNodeDesc.joConfig.skaleConfig.nodeInfo.wallets.ima.url = g_strUrlSgxWalletHTTPS;
         joNodeDesc.joConfig.skaleConfig.nodeInfo.wallets.ima.caFile   = strSkaledNodeSgxDataFolder + "/rootCA.pem"; // TO-DO: should be different for each skaled
         joNodeDesc.joConfig.skaleConfig.nodeInfo.wallets.ima.certFile = strSkaledNodeSgxDataFolder + "/client.crt"; // TO-DO: should be different for each skaled
@@ -1833,6 +1876,14 @@ function all_ima_agents_start() {
                 undefined, // port
                 joNodeDesc.agentFolder
                 );
+<<<<<<< HEAD
+=======
+            if( g_bVerbose )
+                log.write( cc.normal( "Notice, " ) + cc.bright( "IMA Agent" ) + cc.normal( " for node " ) + cc.sunny( joNodeDesc.nodeID )
+                + cc.normal(" folder is ") + cc.info(joNodeDesc.agentFolder)
+                + cc.normal(", log output is ") + cc.info(joNodeDesc.logPath4imaAgent)
+                + "\n" );
+>>>>>>> origin/develop
         }
         joNodeDesc.proc4imaAgent.run();
         //joNodeDesc.proc4imaAgent.continueDetached();
@@ -2141,7 +2192,11 @@ async function redeploy_ima( fnContinue ) {
         , "MNEMONIC_FOR_MAINNET": "" + g_strPrivateKeyImaMN
         , "MNEMONIC_FOR_SCHAIN": "" + g_strPrivateKeyImaSC
     };
+<<<<<<< HEAD
     exec_array_of_commands( [
+=======
+    let arrCommands = [
+>>>>>>> origin/develop
         "node --version"
         , "npm --version"
         ,"yarn --version"
@@ -2158,9 +2213,18 @@ async function redeploy_ima( fnContinue ) {
         , "./node_modules/.bin/truffle compile" //  , "truffle compile"
         , "yarn deploy-to-mainnet" //, "npm run deploy-to-mainnet"
         , "ls -1 ./data/"
+<<<<<<< HEAD
         , "yarn deploy-to-schain" //, "npm run deploy-to-schain"
         , "ls -1 ./data/"
     ], g_strFolderImaProxy, mapEnv );
+=======
+    ];
+    if( ! g_bPredeployedIMA ) {
+        arrCommands.push( "yarn deploy-to-schain" ); //, "npm run deploy-to-schain"
+        arrCommands.push( "ls -1 ./data/" );
+    }
+    exec_array_of_commands( arrCommands, g_strFolderImaProxy, mapEnv );
+>>>>>>> origin/develop
     fnContinue();
 }
 
@@ -2294,6 +2358,15 @@ function ima_check_registration( fnContinue ) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+<<<<<<< HEAD
+=======
+if( g_bVerbose ) {
+    log.write( cc.normal( "Assuming " ) + cc.sunny( "bls_glue" ) + cc.normal( "   is " ) + cc.info( g_strFolderAppCache + "/bin/bls_glue" ) + "\n" );
+    log.write( cc.normal( "Assuming " ) + cc.sunny( "hash_g1" ) + cc.normal( "    is " ) + cc.info( g_strFolderAppCache + "/bin/hash_g1" ) + "\n" );
+    log.write( cc.normal( "Assuming " ) + cc.sunny( "verify_bls" ) + cc.normal( " is " ) + cc.info( g_strFolderAppCache + "/bin/verify_bls" ) + "\n" );
+}
+
+>>>>>>> origin/develop
 async function run() {
     mainnet_start();
     all_skaled_nodes_start();
@@ -2331,6 +2404,7 @@ run();
 
 
 /*
+<<<<<<< HEAD
 reset; node /home/serge/Work/IMA/agent/main.js --verbose=9 --register --url-main-net=http://127.0.0.1:8545 --url-s-chain=http://127.0.0.1:15000 --id-main-net=Mainnet --id-s-chain=Bob --cid-main-net=-4 --cid-s-chain=0x01 --abi-main-net=/home/serge/Work/IMA/proxy/data/proxyMainnet.json --abi-s-chain=/home/serge/Work/IMA/proxy/data/proxySchain_Bob.json --key-main-net=23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC --key-s-chain=80ebc2e00b8f13c5e2622b5694ab63ee80f7c5399554d2a12feeb0212eb8c69e
 reset; node /home/serge/Work/IMA/agent/main.js --verbose=9 --check-registration --url-main-net=http://127.0.0.1:8545 --url-s-chain=http://127.0.0.1:15000 --id-main-net=Mainnet --id-s-chain=Bob --cid-main-net=-4 --cid-s-chain=0x01 --abi-main-net=/home/serge/Work/IMA/proxy/data/proxyMainnet.json --abi-s-chain=/home/serge/Work/IMA/proxy/data/proxySchain_Bob.json --key-main-net=23ABDBD3C61B5330AF61EBE8BEF582F4E5CC08E554053A718BDCE7813B9DC1FC --key-s-chain=80ebc2e00b8f13c5e2622b5694ab63ee80f7c5399554d2a12feeb0212eb8c69e
 
@@ -2364,6 +2438,8 @@ reset; node ./main.js --verbose=9 --s2m-payment --ether=1 \
 
 
 
+=======
+>>>>>>> origin/develop
 
 curl -X POST --data '{"jsonrpc":"2.0","method":"blsSignMessageHash","params":{"keyShareName":"BLS_KEY:SCHAIN_ID:1:NODE_ID:1112:DKG_ID:10390","messageHash":"c479e35e1601856edb6207f204e9758f07c726a1980559a6cad498d561c35860","n":2,"signerIndex":1,"t":2}}' -H 'content-type:application/json;' https://127.0.0.1:1026
 
@@ -2372,7 +2448,10 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"blsSignMessageHash","params":{"k
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/develop
 # Get needed docker images
 
 https://hub.docker.com/repository/docker/skalelabshub/schain
