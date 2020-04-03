@@ -20,7 +20,7 @@ First of all, we need special truffle version **5.0.12** (notice, the *-g* optio
     sudo npm install -g truffle@5.0.12
     truffle --version
 
-Second, get source code of Solidity contracts and install dependecies:
+Second, get source code of Solidity contracts and install dependencies:
 
     git clone git@github.com:skalenetwork/IMA.git
     cd ./IMA
@@ -80,7 +80,7 @@ Fourth, export required environment variables:
     export SCHAIN_NAME="Bob"
 
     export MAINNET_RPC_URL="http://127.0.0.1:8545"
-    export SCHAIN_RPC_URL="http://127.0.0.1:7000"
+    export SCHAIN_RPC_URL="http://127.0.0.1:15000"
     export SCHAIN_NAME="Bob"
     export PRIVATE_KEY_FOR_MAINNET="23abdbd3c61b5330af61ebe8bef582f4e5cc08e554053a718bdce7813b9dc1fc"
     export PRIVATE_KEY_FOR_SCHAIN="80ebc2e00b8f13c5e2622b5694ab63ee80f7c5399554d2a12feeb0212eb8c69e"
@@ -88,7 +88,6 @@ Fourth, export required environment variables:
     export ACCOUNT_FOR_SCHAIN="0x66c5a87f4a49DD75e970055A265E8dd5C3F8f852"
     export MNEMONIC_FOR_MAINNET="23abdbd3c61b5330af61ebe8bef582f4e5cc08e554053a718bdce7813b9dc1fc"
     export MNEMONIC_FOR_SCHAIN="80ebc2e00b8f13c5e2622b5694ab63ee80f7c5399554d2a12feeb0212eb8c69e"
-
 
 Fifth, try rebuild all the contracts once to ensure everything initialized OK:
 
@@ -127,7 +126,7 @@ You can check whether **IMA** is already bound with:
     node ./main.js --verbose=9 \
         --check-registration \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -142,7 +141,7 @@ You can check whether **IMA** is already bound with:
     node ./main.js --verbose=9 \
         --register \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -159,7 +158,7 @@ Performed with the **--loop** command line option:
     node ./main.js --verbose=9 \
         --loop \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -199,7 +198,7 @@ Performed with the **--m2s-payment** command line option:
         --m2s-payment \
         --ether=1 \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -219,7 +218,7 @@ Performed with the **--s2m-payment** command line option:
         --s2m-payment \
         --ether=1 \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -238,7 +237,7 @@ Performed with the **--s2m-view** command line option:
     node ./main.js --verbose=9 \
         --s2m-view \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --cid-main-net=-4 \
         --cid-s-chain=-4 \
@@ -256,7 +255,7 @@ Performed with the **--s2m-receive** command line option:
     node ./main.js --verbose=9 \
         --s2m-receive \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -290,7 +289,7 @@ Performed with the **--m2s-transfer** command line option:
     node ./main.js --verbose=9 \
         --m2s-transfer \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -307,7 +306,7 @@ Performed with the **--s2m-transfer** command line option:
     node ./main.js --verbose=9 \
         --s2m-transfer \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -324,7 +323,7 @@ Performed with the **--transfer** command line option:
     node ./main.js --verbose=9 \
         --transfer \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -366,7 +365,7 @@ Performed with the **--m2s-payment** and **--no-raw-transfer** command line opti
         --m2s-payment \
         --amount=1 \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -392,7 +391,7 @@ Performed with the **--s2m-payment**, **--no-raw-transfer** and **--addr-erc20-s
         --s2m-payment \
         --amount=1 \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -419,7 +418,7 @@ Performed with the **--m2s-payment** and **--raw-transfer** command line options
         --m2s-payment \
         --amount=1 \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -446,7 +445,7 @@ Performed with the **--s2m-payment** and **--raw-transfer** command line options
         --s2m-payment \
         --amount=1 \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -471,7 +470,7 @@ Same as above. But use **721** instead of **20** in command names. Also use **--
 
 You can ask agent app to scan **S-Chain** network information and parameters, print it and exit:
 
-    node ./main.js --verbose=9 --url-s-chain=http://127.0.0.1:7000 -- browse-s-chain
+    node ./main.js --verbose=9 --url-s-chain=http://127.0.0.1:15000 -- browse-s-chain
 
 This information is used to sign messages on all **S-Chain** nodes.
 
@@ -484,7 +483,7 @@ Agent app will scan **S-Chain** network and ask each of nodes to sign messages t
 This options requires all **S-Chain** nodes to be configured with **SGX Wallet** or **Emu Wallet** access information.
 
 The **--bls-glue** command line parameter must be used to specify path to the **bls_glue** application.
-This parameter must be specified if **--sign-messages** paraneter is present.
+This parameter must be specified if **--sign-messages** parameter is present.
 
 The **--bls-verify** command line parameter must be used to specify path to the **verify_bls** application.
 This parameter is optional. If it was specified, then **IMA Agent** application will verify gathered BLS signatures.
@@ -512,6 +511,8 @@ Here is example of correct **config.json** file for **skaled** node:
             "imaMainNet": "????://??.??.??.??:????",
             "imaMessageProxySChain":  "0x????????????????????????????????????????,
             "imaMessageProxyMainNet": "0x????????????????????????????????????????",
+            "imaCallerAddressSChain": "0x????????????????????????????????????????",
+            "imaCallerAddressMainNet": "0x????????????????????????????????????????",
             "wallets": {
                 "ima": {
                     "url": ""????://??.??.??.??:????" "keyShareName": "???????????????", "t": 2, "n": 2,
@@ -547,7 +548,7 @@ Here is example of IMA message processing loop invocation with BLS support:
     reset; node ./main.js --verbose=9 \
         --loop \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
@@ -564,7 +565,7 @@ Here is example of IMA message processing loop invocation with BLS support:
     reset; node ./main.js --verbose=9 \
         --loop \
         --url-main-net=http://127.0.0.1:8545 \
-        --url-s-chain=http://127.0.0.1:7000 \
+        --url-s-chain=http://127.0.0.1:15000 \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
         --cid-main-net=-4 \
