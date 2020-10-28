@@ -1,3 +1,28 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+/**
+ * @license
+ * SKALE IMA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * @file ERC20ModuleForMainnet.spec.ts
+ * @copyright SKALE Labs 2019-Present
+ */
+
 import { BigNumber } from "bignumber.js";
 import * as chaiAsPromised from "chai-as-promised";
 import {
@@ -51,6 +76,10 @@ contract("ERC20ModuleForMainnet", ([deployer, user, invoker]) => {
     const amount = 10;
     const isRaw = true;
     await ethERC20.mint(deployer, 10, {from: deployer});
+    await lockAndDataForMainnet
+        .setContract("ERC20Module", eRC20ModuleForMainnet.address, {from: deployer});
+    await lockAndDataForMainnet
+        .setContract("LockAndDataERC20", lockAndDataForMainnetERC20.address, {from: deployer});
     // execution
     const res = await eRC20ModuleForMainnet.receiveERC20.call(contractHere, to, amount, isRaw, {from: deployer});
     // expectation

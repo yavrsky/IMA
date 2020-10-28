@@ -1,3 +1,28 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+/**
+ * @license
+ * SKALE IMA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * @file TokenManager.spec.ts
+ * @copyright SKALE Labs 2019-Present
+ */
+
 import { BigNumber } from "bignumber.js";
 import * as chaiAsPromised from "chai-as-promised";
 
@@ -1128,6 +1153,7 @@ contract("TokenManager", ([user, deployer, client]) => {
             const to0 = eRC20OnChain.address; // ERC20 address
             const sender = deployer;
             const data = "0x13" +
+                "0000000000000000000000000000000000000000000000000000000000000001" +
                 to.substr(2) + "000000000000000000000000" +
                 "000000000000000000000000000000000000000000000000000000000000000a";
             // add schain to avoid the `Unconnected chain` error
@@ -1161,8 +1187,11 @@ contract("TokenManager", ([user, deployer, client]) => {
             // transfer ownership of using ethERC20 contract method to lockAndDataForSchain contract address:
             await ethERC20.transferOwnership(lockAndDataForSchain.address, {from: deployer});
             // execution
+            console.log("OK");
+            console.log("Erc20 on chain", to0);
             await tokenManager
               .postMessage(sender, schainID, to0, amount, data, {from: deployer});
+            console.log("Not OK");
             // expectation
             expect(parseInt((web3.utils.toBN(await ethERC20.balanceOf(to))).toString(), 10))
                 .to.be.equal(amount);

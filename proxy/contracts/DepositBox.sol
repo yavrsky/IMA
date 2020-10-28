@@ -1,20 +1,22 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 /**
  *   DepositBox.sol - SKALE Interchain Messaging Agent
  *   Copyright (C) 2019-Present SKALE Labs
  *   @author Artem Payvin
  *
- *   SKALE-IMA is free software: you can redistribute it and/or modify
+ *   SKALE IMA is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
  *   by the Free Software Foundation, either version 3 of the License, or
  *   (at your option) any later version.
  *
- *   SKALE-IMA is distributed in the hope that it will be useful,
+ *   SKALE IMA is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Affero General Public License for more details.
  *
  *   You should have received a copy of the GNU Affero General Public License
- *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
+ *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 pragma solidity ^0.6.0;
@@ -26,12 +28,11 @@ import "./interfaces/IERC721Module.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Full.sol";
 
-
 interface ILockAndDataDB {
     function setContract(string calldata contractName, address newContract) external;
     function tokenManagerAddresses(bytes32 schainHash) external returns (address);
-    function sendEth(address to, uint amount) external returns (bool);
-    function approveTransfer(address to, uint amount) external;
+    function sendEth(address to, uint256 amount) external returns (bool);
+    function approveTransfer(address to, uint256 amount) external;
     function addSchain(string calldata schainID, address tokenManagerAddress) external;
     function receiveEth(address from) external payable;
 }
@@ -54,13 +55,13 @@ contract DepositBox is PermissionsForMainnet {
     uint public constant GAS_AMOUNT_POST_MESSAGE = 200000; // 0;
     uint public constant AVERAGE_TX_PRICE = 10000000000;
 
-    //mapping(address => mapping(address => uint)) public allowed;
+    //mapping(address => mapping(address => uint256)) public allowed;
 
     event MoneyReceivedMessage(
         address sender,
         string fromSchainID,
         address to,
-        uint amount,
+        uint256 amount,
         bytes data
     );
 
@@ -68,7 +69,7 @@ contract DepositBox is PermissionsForMainnet {
         address sender,
         string fromSchainID,
         address to,
-        uint amount,
+        uint256 amount,
         bytes data,
         string message
     );
@@ -104,7 +105,7 @@ contract DepositBox is PermissionsForMainnet {
         string calldata schainID,
         address contractHere,
         address to,
-        uint amount
+        uint256 amount
     )
         external
         payable
@@ -151,7 +152,7 @@ contract DepositBox is PermissionsForMainnet {
         address contractHere,
         address contractThere,
         address to,
-        uint amount
+        uint256 amount
     )
         external
         payable
@@ -196,7 +197,7 @@ contract DepositBox is PermissionsForMainnet {
         string calldata schainID,
         address contractHere,
         address to,
-        uint tokenId) external payable rightTransaction(schainID)
+        uint256 tokenId) external payable rightTransaction(schainID)
         {
         bytes32 schainHash = keccak256(abi.encodePacked(schainID));
         address lockAndDataERC721 = IContractManagerForMainnet(lockAndDataAddress_).getContract("LockAndDataERC721");
@@ -226,7 +227,7 @@ contract DepositBox is PermissionsForMainnet {
         address contractHere,
         address contractThere,
         address to,
-        uint tokenId
+        uint256 tokenId
     )
         external
         payable
@@ -259,7 +260,7 @@ contract DepositBox is PermissionsForMainnet {
         address sender,
         string calldata fromSchainID,
         address payable to,
-        uint amount,
+        uint256 amount,
         bytes calldata data
     )
         external

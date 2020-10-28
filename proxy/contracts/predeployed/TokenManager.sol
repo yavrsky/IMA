@@ -1,20 +1,22 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 /**
  *   TokenManager.sol - SKALE Interchain Messaging Agent
  *   Copyright (C) 2019-Present SKALE Labs
  *   @author Artem Payvin
  *
- *   SKALE-IMA is free software: you can redistribute it and/or modify
+ *   SKALE IMA is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
  *   by the Free Software Foundation, either version 3 of the License, or
  *   (at your option) any later version.
  *
- *   SKALE-IMA is distributed in the hope that it will be useful,
+ *   SKALE IMA is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Affero General Public License for more details.
  *
  *   You should have received a copy of the GNU Affero General Public License
- *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
+ *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 pragma solidity ^0.6.0;
@@ -26,16 +28,17 @@ import "./../interfaces/IERC721Module.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Full.sol";
 
+
 interface ILockAndDataTM {
     function setContract(string calldata contractName, address newContract) external;
     function tokenManagerAddresses(bytes32 schainHash) external returns (address);
-    function sendEth(address to, uint amount) external returns (bool);
-    function receiveEth(address sender, uint amount) external returns (bool);
-    function approveTransfer(address to, uint amount) external;
-    function ethCosts(address to) external returns (uint);
-    function addGasCosts(address to, uint amount) external;
-    function reduceGasCosts(address to, uint amount) external returns (bool);
-    function removeGasCosts(address to) external returns (uint);
+    function sendEth(address to, uint256 amount) external returns (bool);
+    function receiveEth(address sender, uint256 amount) external returns (bool);
+    function approveTransfer(address to, uint256 amount) external;
+    function ethCosts(address to) external returns (uint256);
+    function addGasCosts(address to, uint256 amount) external;
+    function reduceGasCosts(address to, uint256 amount) external returns (bool);
+    function removeGasCosts(address to) external returns (uint256);
 }
 
 // This contract runs on schains and accepts messages from main net creates ETH clones.
@@ -61,11 +64,11 @@ contract TokenManager is PermissionsForSchain {
 
     // TODO: TOKEN_RESERVE = 102000000 * (10 ** 18);
 
-    //uint public TOKEN_RESERVE = 102000000 * (10 ** 18); //ether
-    //uint public TOKEN_RESERVE = 10 * (10 ** 18); //ether
+    //uint256 public TOKEN_RESERVE = 102000000 * (10 ** 18); //ether
+    //uint256 public TOKEN_RESERVE = 10 * (10 ** 18); //ether
 
-    uint public constant GAS_AMOUNT_POST_MESSAGE = 200000;
-    uint public constant AVERAGE_TX_PRICE = 10000000000;
+    uint256 public constant GAS_AMOUNT_POST_MESSAGE = 200000;
+    uint256 public constant AVERAGE_TX_PRICE = 10000000000;
 
     // Owner of this schain. For mainnet
     //address public owner;
@@ -74,7 +77,7 @@ contract TokenManager is PermissionsForSchain {
         address sender,
         string fromSchainID,
         address to,
-        uint amount,
+        uint256 amount,
         bytes data,
         string message
     );
@@ -87,7 +90,7 @@ contract TokenManager is PermissionsForSchain {
         _;
     }
 
-    modifier receivedEth(uint amount) {
+    modifier receivedEth(uint256 amount) {
         require(amount >= GAS_AMOUNT_POST_MESSAGE * AVERAGE_TX_PRICE, "Null Amount");
         require(ILockAndDataTM(getLockAndDataAddress()).receiveEth(msg.sender, amount), "Could not receive ETH Clone");
         _;
@@ -116,20 +119,20 @@ contract TokenManager is PermissionsForSchain {
     //     }
     // }
 
-    function exitToMainWithoutData(address to, uint amount) external {
+    function exitToMainWithoutData(address to, uint256 amount) external {
         exitToMain(to, amount);
     }
 
-    function transferToSchainWithoutData(string calldata schainID, address to, uint amount) external {
+    function transferToSchainWithoutData(string calldata schainID, address to, uint256 amount) external {
         transferToSchain(schainID, to, amount);
     }
 
-    function addEthCostWithoutAddress(uint amount) external {
+    function addEthCostWithoutAddress(uint256 amount) external {
         addEthCost(amount);
     }
 
     function removeEthCost() external {
-        uint returnBalance = ILockAndDataTM(getLockAndDataAddress()).removeGasCosts(msg.sender);
+        uint256 returnBalance = ILockAndDataTM(getLockAndDataAddress()).removeGasCosts(msg.sender);
         require(ILockAndDataTM(getLockAndDataAddress()).sendEth(msg.sender, returnBalance), "Not sent");
     }
 
@@ -174,7 +177,7 @@ contract TokenManager is PermissionsForSchain {
         address contractHere,
         address contractThere,
         address to,
-        uint amount) external
+        uint256 amount) external
         {
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         address erc20Module = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
@@ -216,7 +219,7 @@ contract TokenManager is PermissionsForSchain {
         string calldata schainID,
         address contractHere,
         address to,
-        uint amount) external
+        uint256 amount) external
         {
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         address erc20Module = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
@@ -254,7 +257,7 @@ contract TokenManager is PermissionsForSchain {
         address contractHere,
         address contractThere,
         address to,
-        uint amount) external
+        uint256 amount) external
         {
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         address erc20Module = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
@@ -287,7 +290,7 @@ contract TokenManager is PermissionsForSchain {
         );
     }
 
-    function exitToMainERC721(address contractHere, address to, uint tokenId) external {
+    function exitToMainERC721(address contractHere, address to, uint256 tokenId) external {
         address lockAndDataERC721 = IContractManagerForSchain(getLockAndDataAddress()).
             getContract("LockAndDataERC721");
         address erc721Module = IContractManagerForSchain(getLockAndDataAddress()).
@@ -318,7 +321,7 @@ contract TokenManager is PermissionsForSchain {
         address contractHere,
         address contractThere,
         address to,
-        uint tokenId) external
+        uint256 tokenId) external
         {
         address lockAndDataERC721 = IContractManagerForSchain(getLockAndDataAddress()).
             getContract("LockAndDataERC721");
@@ -350,7 +353,7 @@ contract TokenManager is PermissionsForSchain {
         string calldata schainID,
         address contractHere,
         address to,
-        uint tokenId) external
+        uint256 tokenId) external
         {
         address lockAndDataERC721 = IContractManagerForSchain(getLockAndDataAddress()).
             getContract("LockAndDataERC721");
@@ -378,7 +381,7 @@ contract TokenManager is PermissionsForSchain {
         address contractHere,
         address contractThere,
         address to,
-        uint tokenId) external
+        uint256 tokenId) external
         {
         address lockAndDataERC721 = IContractManagerForSchain(getLockAndDataAddress()).
             getContract("LockAndDataERC721");
@@ -407,7 +410,7 @@ contract TokenManager is PermissionsForSchain {
         address sender,
         string calldata fromSchainID,
         address to,
-        uint amount,
+        uint256 amount,
         bytes calldata data
     )
         external
@@ -461,12 +464,12 @@ contract TokenManager is PermissionsForSchain {
 
     // This is called by schain owner.
     // Exit to main net
-    function exitToMain(address to, uint amount) public {
+    function exitToMain(address to, uint256 amount) public {
         bytes memory empty = "";
         exitToMain(to, amount, empty);
     }
 
-    function exitToMain(address to, uint amount, bytes memory data) public receivedEth(amount) {
+    function exitToMain(address to, uint256 amount, bytes memory data) public receivedEth(amount) {
         bytes memory newData;
         newData = abi.encodePacked(bytes1(uint8(1)), data);
         IMessageProxy(getProxyForSchainAddress()).postOutgoingMessage(
@@ -478,7 +481,7 @@ contract TokenManager is PermissionsForSchain {
         );
     }
 
-    function transferToSchain(string memory schainID, address to, uint amount) public {
+    function transferToSchain(string memory schainID, address to, uint256 amount) public {
         bytes memory data = "";
         transferToSchain(
             schainID,
@@ -490,7 +493,7 @@ contract TokenManager is PermissionsForSchain {
     function transferToSchain(
         string memory schainID,
         address to,
-        uint amount,
+        uint256 amount,
         bytes memory data
     )
         public
@@ -506,11 +509,11 @@ contract TokenManager is PermissionsForSchain {
         );
     }
 
-    function addEthCost(uint amount) public {
+    function addEthCost(uint256 amount) public {
         addEthCost(msg.sender, amount);
     }
 
-    function addEthCost(address sender, uint amount) public receivedEth(amount) {
+    function addEthCost(address sender, uint256 amount) public receivedEth(amount) {
         ILockAndDataTM(getLockAndDataAddress()).addGasCosts(sender, amount);
     }
 

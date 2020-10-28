@@ -1,20 +1,22 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 /**
  *   LockAndDataForSchain.sol - SKALE Interchain Messaging Agent
  *   Copyright (C) 2019-Present SKALE Labs
  *   @author Artem Payvin
  *
- *   SKALE-IMA is free software: you can redistribute it and/or modify
+ *   SKALE IMA is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
  *   by the Free Software Foundation, either version 3 of the License, or
  *   (at your option) any later version.
  *
- *   SKALE-IMA is distributed in the hope that it will be useful,
+ *   SKALE IMA is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Affero General Public License for more details.
  *
  *   You should have received a copy of the GNU Affero General Public License
- *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
+ *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 pragma solidity ^0.6.0;
@@ -22,7 +24,7 @@ pragma solidity ^0.6.0;
 import "./OwnableForSchain.sol";
 
 interface IETHERC20 {
-    function allowance(address from, address to) external returns (uint);
+    function allowance(address from, address to) external returns (uint256);
     function mint(address account, uint256 amount) external returns (bool);
     function burn(uint256 amount) external;
     function burnFrom(address from, uint256 amount) external;
@@ -37,7 +39,7 @@ contract LockAndDataForSchain is OwnableForSchain {
 
     mapping(bytes32 => address) public tokenManagerAddresses;
 
-    mapping(address => uint) public ethCosts;
+    mapping(address => uint256) public ethCosts;
 
     mapping(address => bool) public authorizedCaller;
 
@@ -67,7 +69,7 @@ contract LockAndDataForSchain is OwnableForSchain {
         //require(permitted[contractId] != newContract, "Contract is already added");
         require(!checkPermitted(contractName,newContract), "Contract is already added"); // l_sergiy: repacement
 
-        uint length;
+        uint256 length;
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             length := extcodesize(newContract)
@@ -138,11 +140,11 @@ contract LockAndDataForSchain is OwnableForSchain {
         authorizedCaller[caller] = false;
     }
 
-    function addGasCosts(address to, uint amount) external allow("TokenManager") {
+    function addGasCosts(address to, uint256 amount) external allow("TokenManager") {
         ethCosts[to] += amount;
     }
 
-    function reduceGasCosts(address to, uint amount) external allow("TokenManager") returns (bool) {
+    function reduceGasCosts(address to, uint256 amount) external allow("TokenManager") returns (bool) {
         if (ethCosts[to] >= amount) {
             ethCosts[to] -= amount;
             return true;
@@ -153,17 +155,17 @@ contract LockAndDataForSchain is OwnableForSchain {
         return false;
     }
 
-    function removeGasCosts(address to) external allow("TokenManager") returns (uint balance) {
+    function removeGasCosts(address to) external allow("TokenManager") returns (uint256 balance) {
         balance = ethCosts[to];
         delete ethCosts[to];
     }
 
-    function sendEth(address to, uint amount) external allow("TokenManager") returns (bool) {
+    function sendEth(address to, uint256 amount) external allow("TokenManager") returns (bool) {
         require(IETHERC20(getEthERC20Address()).mint(to, amount), "Mint error");
         return true;
     }
 
-    function receiveEth(address sender, uint amount) external allow("TokenManager") returns (bool) {
+    function receiveEth(address sender, uint256 amount) external allow("TokenManager") returns (bool) {
         IETHERC20(getEthERC20Address()).burnFrom(sender, amount);
         return true;
     }

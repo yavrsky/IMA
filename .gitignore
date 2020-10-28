@@ -61,14 +61,15 @@ __pycache__/
 
 proxy/proxy.json
 proxy/data/*.json
+ima_data.json
 
 test/working
 test/config.json
 
 
 .vscode
-functional_check/engine/package-lock.json
-functional_check/s_chain_gen/node_??
-functional_check/s_chain_gen/package-lock.json
-functional_check/skale-manager
-package-lock.json
+
+actions-runner/
+
+
+venv

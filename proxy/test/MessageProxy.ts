@@ -1,3 +1,28 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+/**
+ * @license
+ * SKALE IMA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * @file MessageProxy.ts
+ * @copyright SKALE Labs 2019-Present
+ */
+
 import { BigNumber } from "bignumber.js";
 import * as chaiAsPromised from "chai-as-promised";
 
@@ -50,20 +75,22 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
         "1122334455667788990011223344556677889900112233445566778899001122",
     ];
 
-    const blsSignature = [
+    const BlsSignature = [
         "1122334455667788990011223344556677889900112233445566778899001122",
         "1122334455667788990011223344556677889900112233445566778899001122",
     ];
 
-    const hashA = "1122334455667788990011223344556677889900112233445566778899001122";
-    const hashB = "1122334455667788990011223344556677889900112233445566778899001122";
-    const counter = 0;
+    const HashA = "1122334455667788990011223344556677889900112233445566778899001122";
+    const HashB = "1122334455667788990011223344556677889900112233445566778899001122";
+    const Counter = 0;
 
     describe("MessageProxyForMainnet for mainnet", async () => {
         beforeEach(async () => {
             contractManager = await ContractManager.new({from: deployer});
             skaleVerifier = await SkaleVerifier.new({from: deployer});
-            await contractManager.setContractsAddress("SkaleVerifier", skaleVerifier.address, {from: deployer});
+            await contractManager.setContractsAddress("Schains", skaleVerifier.address, {from: deployer});
+            messageProxyForMainnet = await MessageProxyForMainnet.new("Mainnet", contractManager.address,
+                {from: deployer});
             lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
             messageProxyForMainnet = await MessageProxyForMainnet.new("Mainnet", true, lockAndDataForMainnet.address,
                 {from: deployer});
@@ -82,9 +109,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
             await messageProxyForMainnet.addConnectedChain(someCainID, publicKeyArray, {from: deployer});
             const connectedChain = await messageProxyForMainnet.isConnectedChain(someCainID);
             connectedChain.should.be.deep.equal(Boolean(true));
-
-            // main net does not have a public key and is implicitly connected:
-            await messageProxyForMainnet.isConnectedChain("Mainnet").should.be.rejected;
+            // // main net does not have a public key and is implicitly connected:
+            // await messageProxyForMainnet.isConnectedChain("Mainnet").should.be.rejected;
         });
 
         it("should add connected chain", async () => {
@@ -97,9 +123,9 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
             await messageProxyForMainnet.addConnectedChain(chainID, publicKeyArray, {from: deployer})
             .should.be.rejectedWith("Chain is already connected");
 
-            // main net does not have a public key and is implicitly connected:
-            await messageProxyForMainnet.addConnectedChain("Mainnet", publicKeyArray, {from: deployer})
-            .should.be.rejectedWith("SKALE chain name is incorrect. Inside in MessageProxy");
+            // // main net does not have a public key and is implicitly connected:
+            // await messageProxyForMainnet.addConnectedChain("Mainnet", publicKeyArray, {from: deployer})
+            // .should.be.rejectedWith("SKALE chain name is incorrect. Inside in MessageProxy");
         });
 
         it("should remove connected chain", async () => {
@@ -159,6 +185,12 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 to: customer};
 
             const messages = [message1, message2];
+            const sign = {
+                blsSignature: BlsSignature,
+                counter: Counter,
+                hashA: HashA,
+                hashB: HashB,
+            };
 
             // chain should be inited:
             await messageProxyForMainnet
@@ -166,10 +198,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                     chainID,
                     startingCounter,
                     messages,
-                    blsSignature,
-                    hashA,
-                    hashB,
-                    counter,
+                    sign,
+                    0,
                     {from: deployer},
                 ).should.be.rejected;
 
@@ -180,10 +210,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 chainID,
                 startingCounter,
                 messages,
-                blsSignature,
-                hashA,
-                hashB,
-                counter,
+                sign,
+                0,
                 {from: deployer},
             );
             const incomingMessagesCounter = web3.utils.toBN(
@@ -233,6 +261,12 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 sender: user,
                 to: customer};
             const messages = [message1, message2];
+            const sign = {
+                blsSignature: BlsSignature,
+                counter: Counter,
+                hashA: HashA,
+                hashB: HashB,
+            };
 
             // chain should be inited:
             await messageProxyForMainnet.getIncomingMessagesCounter(chainID).should.be.rejected;
@@ -248,10 +282,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 chainID,
                 startingCounter,
                 messages,
-                blsSignature,
-                hashA,
-                hashB,
-                counter,
+                sign,
+                0,
                 {from: deployer},
             );
             const incomingMessagesCounter = web3.utils.toBN(
@@ -300,6 +332,12 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 sender: user,
                 to: customer};
             const messages = [message1, message2];
+            const sign = {
+                blsSignature: BlsSignature,
+                counter: Counter,
+                hashA: HashA,
+                hashB: HashB,
+            };
 
             // chain should be inited:
             await messageProxyForMainnet.getIncomingMessagesCounter(chainID).should.be.rejected;
@@ -315,10 +353,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 chainID,
                 startingCounter,
                 messages,
-                blsSignature,
-                hashA,
-                hashB,
-                counter,
+                sign,
+                0,
                 {from: deployer},
             );
             const incomingMessagesCounter = web3.utils.toBN(
@@ -374,9 +410,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
             await messageProxyForSchain.addConnectedChain(someCainID, publicKeyArray, {from: deployer});
             const connectedChain = await messageProxyForSchain.isConnectedChain(someCainID);
             connectedChain.should.be.deep.equal(Boolean(true));
-
-            // main net does not have a public key and is implicitly connected:
-            await messageProxyForSchain.isConnectedChain("Mainnet").should.be.rejected;
+            // // main net does not have a public key and is implicitly connected:
+            // await messageProxyForSchain.isConnectedChain("Mainnet").should.be.rejected;
         });
 
         it("should add connected chain", async () => {
@@ -384,14 +419,12 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
             await messageProxyForSchain.addConnectedChain(chainID, publicKeyArray, {from: deployer});
             const isConnectedChain = await messageProxyForSchain.isConnectedChain(chainID);
             isConnectedChain.should.be.deep.equal(Boolean(true));
-
             // chain can't be connected twice:
             await messageProxyForSchain.addConnectedChain(chainID, publicKeyArray, {from: deployer})
             .should.be.rejectedWith("Chain is already connected");
-
             // main net does not have a public key and is implicitly connected:
-            await messageProxyForSchain.addConnectedChain("Mainnet", publicKeyArray, {from: deployer})
-            .should.be.rejectedWith("SKALE chain name is incorrect. Inside in MessageProxy");
+            // await messageProxyForSchain.addConnectedChain("Mainnet", publicKeyArray, {from: deployer})
+            // .should.be.rejectedWith("SKALE chain name is incorrect. Inside in MessageProxy");
         });
 
         it("should remove connected chain", async () => {
@@ -448,16 +481,20 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 sender: user,
                 to: customer};
             const messages = [message1, message2];
+            const sign = {
+                blsSignature: BlsSignature,
+                counter: Counter,
+                hashA: HashA,
+                hashB: HashB,
+            };
 
             // chain should be inited:
             await messageProxyForSchain.postIncomingMessages(
                 chainID,
                 startingCounter,
                 messages,
-                blsSignature,
-                hashA,
-                hashB,
-                counter,
+                sign,
+                0,
                 {from: deployer},
             ).should.be.rejected;
 
@@ -467,10 +504,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 chainID,
                 startingCounter,
                 messages,
-                blsSignature,
-                hashA,
-                hashB,
-                counter,
+                sign,
+                0,
                 {from: deployer},
             );
             const incomingMessagesCounter = web3.utils.toBN(
@@ -520,6 +555,12 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 sender: user,
                 to: customer};
             const messages = [message1, message2];
+            const sign = {
+                blsSignature: BlsSignature,
+                counter: Counter,
+                hashA: HashA,
+                hashB: HashB,
+            };
 
             // chain should be inited:
             await messageProxyForSchain.getIncomingMessagesCounter(chainID).should.be.rejected;
@@ -534,10 +575,8 @@ contract("MessageProxy", ([user, deployer, client, customer]) => {
                 chainID,
                 startingCounter,
                 messages,
-                blsSignature,
-                hashA,
-                hashB,
-                counter,
+                sign,
+                0,
                 {from: deployer},
             );
             const incomingMessagesCounter = web3.utils.toBN(

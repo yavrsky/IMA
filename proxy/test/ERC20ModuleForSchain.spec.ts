@@ -1,3 +1,28 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+/**
+ * @license
+ * SKALE IMA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * @file ERC20ModuleForSchain.spec.ts
+ * @copyright SKALE Labs 2019-Present
+ */
+
 import { BigNumber } from "bignumber.js";
 import * as chaiAsPromised from "chai-as-promised";
 import {
@@ -62,6 +87,14 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     const to = user;
     const amount = 10;
     const isRaw = true;
+    // set `ERC20Module` contract before invoke `receiveERC20`
+    await lockAndDataForSchain
+        .setContract("ERC20Module", eRC20ModuleForSchain.address, {from: deployer});
+    // set `LockAndDataERC20` contract before invoke `receiveERC20`
+    await lockAndDataForSchain
+        .setContract("LockAndDataERC20", lockAndDataForSchainERC20.address, {from: deployer});
+    await eRC20OnChain.mint(lockAndDataForSchainERC20.address, "10", {from: deployer});
+    await lockAndDataForSchainERC20.addERC20Token(contractHere, 1, {from: deployer});
     // execution
     const res = await eRC20ModuleForSchain.receiveERC20.call(contractHere, to, amount, isRaw, {from: deployer});
     // expectation
@@ -220,13 +253,14 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(amount);
   });
 
-  it("should return `true` when invoke `sendERC20` with `to0==ethERC20.address`", async () => {
+  it("should be rejected with incorrect Minter when invoke `sendERC20` with `to0==ethERC20.address`", async () => {
     // preparation
     const contractHere = eRC20OnChain.address;
     const to = user;
     const to0 = eRC20OnChain2.address; // bytes20
     const amount = 10;
     const isRaw = true;
+    const error = "MinterRole: caller does not have the Minter role"
     // set `ERC20Module` contract before invoke `receiveERC20`
     await lockAndDataForSchain
         .setContract("ERC20Module", eRC20ModuleForSchain.address, {from: deployer});
@@ -236,13 +270,42 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     // invoke `addMinter` before `sendERC20` to avoid `MinterRole: caller does not have the Minter role` exception
     await eRC20OnChain2.addMinter(lockAndDataForSchainERC20.address);
     // get data from `receiveERC20`
+    await eRC20OnChain.mint(lockAndDataForSchainERC20.address, "20", {from: deployer});
+    await lockAndDataForSchainERC20.addERC20Token(contractHere, 1, {from: deployer});
     const data = await eRC20ModuleForSchain.receiveERC20.call(contractHere, to, amount, isRaw, {from: deployer});
     await eRC20ModuleForSchain.receiveERC20(contractHere, to, amount, isRaw, {from: deployer});
     // execution
-    const res = await eRC20ModuleForSchain.sendERC20(to0, data, {from: deployer});
+    await eRC20ModuleForSchain.sendERC20(to0, data, {from: deployer}).should.be.eventually.rejectedWith(error);
+  });
+
+  it("should return true when invoke `sendERC20` with `to0==ethERC20.address`", async () => {
+    // preparation
+    const contractHere = eRC20OnChain.address;
+    const to = user;
+    const to0 = eRC20OnChain2.address; // bytes20
+    const amount = 10;
+    const isRaw = true;
+    const error = "MinterRole: caller does not have the Minter role"
+    // set `ERC20Module` contract before invoke `receiveERC20`
+    await lockAndDataForSchain
+        .setContract("ERC20Module", eRC20ModuleForSchain.address, {from: deployer});
+    // set `LockAndDataERC20` contract before invoke `receiveERC20`
+    await lockAndDataForSchain
+        .setContract("LockAndDataERC20", lockAndDataForSchainERC20.address, {from: deployer});
+    // invoke `addMinter` before `sendERC20` to avoid `MinterRole: caller does not have the Minter role` exception
+    await eRC20OnChain2.addMinter(lockAndDataForSchainERC20.address);
+    await eRC20OnChain.addMinter(lockAndDataForSchainERC20.address);
+    // get data from `receiveERC20`
+    await eRC20OnChain.mint(lockAndDataForSchainERC20.address, "10", {from: deployer});
+    // await eRC20OnChain2.mint(lockAndDataForSchainERC20.address, "20", {from: deployer});
+    await lockAndDataForSchainERC20.addERC20Token(contractHere, 1, {from: deployer});
+    const data = await eRC20ModuleForSchain.receiveERC20.call(contractHere, to, amount, isRaw, {from: deployer});
+    await eRC20ModuleForSchain.receiveERC20(contractHere, to, amount, isRaw, {from: deployer});
+    // execution
+    await eRC20ModuleForSchain.sendERC20(to0, data, {from: deployer});
     // expectation
-    const balance = await eRC20OnChain2.balanceOf(to);
-    parseInt(web3.utils.toBN(balance).toString(), 10).should.be.equal(amount);
+    const balance = await eRC20OnChain.balanceOf(to);
+    parseInt(new BigNumber(balance).toString(), 10).should.be.equal(amount);
   });
 
   it("should return `receiver` when invoke `getReceiver` with `to0==ethERC20.address`", async () => {
@@ -263,6 +326,7 @@ contract("ERC20ModuleForSchain", ([deployer, user, invoker]) => {
     // transfer more than `amount` quantity of ERC20 tokens for `lockAndDataForSchainERC20` to avoid `Not enough money`
     await ethERC20.transfer(lockAndDataForSchainERC20.address, "1000000", {from: deployer});
     // get data from `receiveERC20`
+    await lockAndDataForSchainERC20.addERC20Token(contractHere, 1, {from: deployer});
     const data = await eRC20ModuleForSchain.receiveERC20.call(contractHere, to, amount, isRaw, {from: deployer});
     await eRC20ModuleForSchain.receiveERC20(contractHere, to, amount, isRaw, {from: deployer});
     // execution

@@ -1,19 +1,40 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+/**
+ *   ERC721ModuleForMainnet.sol - SKALE Interchain Messaging Agent
+ *   Copyright (C) 2019-Present SKALE Labs
+ *   @author Artem Payvin
+ *
+ *   SKALE IMA is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as published
+ *   by the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   SKALE IMA is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 pragma solidity ^0.6.0;
 
 import "./PermissionsForMainnet.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Full.sol";
 
 interface ILockAndDataERC721M {
-    function erc721Tokens(uint index) external returns (address);
-    function erc721Mapper(address contractERC721) external returns (uint);
-    function addERC721Token(address contractERC721) external returns (uint);
-    function sendERC721(address contractHere, address to, uint token) external returns (bool);
+    function erc721Tokens(uint256 index) external returns (address);
+    function erc721Mapper(address contractERC721) external returns (uint256);
+    function addERC721Token(address contractERC721) external returns (uint256);
+    function sendERC721(address contractHere, address to, uint256 token) external returns (bool);
 }
 
 
 contract ERC721ModuleForMainnet is PermissionsForMainnet {
 
-    event ERC721TokenAdded(address indexed tokenHere, uint contractPosition);
+    event ERC721TokenAdded(address indexed tokenHere, uint256 contractPosition);
 
     constructor(address newLockAndDataAddress) PermissionsForMainnet(newLockAndDataAddress) public {
         // solium-disable-previous-line no-empty-blocks
@@ -22,12 +43,12 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
     function receiveERC721(
         address contractHere,
         address to,
-        uint tokenId,
+        uint256 tokenId,
         bool isRAW) external allow("DepositBox") returns (bytes memory data)
         {
         address lockAndDataERC721 = IContractManagerForMainnet(lockAndDataAddress_).getContract("LockAndDataERC721");
         if (!isRAW) {
-            uint contractPosition = ILockAndDataERC721M(lockAndDataERC721).erc721Mapper(contractHere);
+            uint256 contractPosition = ILockAndDataERC721M(lockAndDataERC721).erc721Mapper(contractHere);
             if (contractPosition == 0) {
                 contractPosition = ILockAndDataERC721M(lockAndDataERC721).addERC721Token(contractHere);
                 emit ERC721TokenAdded(contractHere, contractPosition);
@@ -49,7 +70,7 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
         uint contractPosition;
         address contractAddress;
         address receiver;
-        uint tokenId;
+        uint256 tokenId;
         if (to == address(0)) {
             (contractPosition, receiver, tokenId) = fallbackDataParser(data);
             contractAddress = ILockAndDataERC721M(lockAndDataERC721).erc721Tokens(contractPosition);
@@ -61,8 +82,8 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
     }
 
     function getReceiver(address to, bytes calldata data) external pure returns (address receiver) {
-        uint contractPosition;
-        uint amount;
+        uint256 contractPosition;
+        uint256 amount;
         if (to == address(0)) {
             (contractPosition, receiver, amount) = fallbackDataParser(data);
         } else {
@@ -72,9 +93,9 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
 
     function encodeData(
         address contractHere,
-        uint contractPosition,
+        uint256 contractPosition,
         address to,
-        uint tokenId) internal view returns (bytes memory data)
+        uint256 tokenId) internal view returns (bytes memory data)
         {
         string memory name = IERC721Full(contractHere).name();
         string memory symbol = IERC721Full(contractHere).symbol();
@@ -90,7 +111,7 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
         );
     }
 
-    function encodeRawData(address to, uint tokenId) internal pure returns (bytes memory data) {
+    function encodeRawData(address to, uint256 tokenId) internal pure returns (bytes memory data) {
         data = abi.encodePacked(
             bytes1(uint8(21)),
             bytes32(bytes20(to)),
@@ -101,7 +122,7 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
     function fallbackDataParser(bytes memory data)
         internal
         pure
-        returns (uint, address payable, uint)
+        returns (uint256, address payable, uint256)
     {
         bytes32 contractIndex;
         bytes32 to;
@@ -112,14 +133,14 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
             token := mload(add(data, 97))
         }
         return (
-            uint(contractIndex), address(bytes20(to)), uint(token)
+            uint256(contractIndex), address(bytes20(to)), uint256(token)
         );
     }
 
     function fallbackRawDataParser(bytes memory data)
         internal
         pure
-        returns (address payable, uint)
+        returns (address payable, uint256)
     {
         bytes32 to;
         bytes32 token;
@@ -127,7 +148,7 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
             to := mload(add(data, 33))
             token := mload(add(data, 65))
         }
-        return (address(bytes20(to)), uint(token));
+        return (address(bytes20(to)), uint256(token));
     }
 
 }

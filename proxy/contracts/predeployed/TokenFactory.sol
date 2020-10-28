@@ -1,20 +1,22 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 /**
  *   TokenFactory.sol - SKALE Interchain Messaging Agent
  *   Copyright (C) 2019-Present SKALE Labs
  *   @author Artem Payvin
  *
- *   SKALE-IMA is free software: you can redistribute it and/or modify
+ *   SKALE IMA is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
  *   by the Free Software Foundation, either version 3 of the License, or
  *   (at your option) any later version.
  *
- *   SKALE-IMA is distributed in the hope that it will be useful,
+ *   SKALE IMA is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Affero General Public License for more details.
  *
  *   You should have received a copy of the GNU Affero General Public License
- *   along with SKALE-IMA.  If not, see <https://www.gnu.org/licenses/>.
+ *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 pragma solidity ^0.6.0;
@@ -73,7 +75,7 @@ contract MinterRole is Context {
 
 contract ERC20OnChain is ERC20Detailed, ERC20, MinterRole {
 
-    uint private _totalSupplyOnMainnet;
+    uint256 private _totalSupplyOnMainnet;
 
     address private addressOfErc20Module;
 
@@ -91,11 +93,11 @@ contract ERC20OnChain is ERC20Detailed, ERC20, MinterRole {
         addressOfErc20Module = erc20Module;
     }
 
-    function totalSupplyOnMainnet() external view returns (uint) {
+    function totalSupplyOnMainnet() external view returns (uint256) {
         return _totalSupplyOnMainnet;
     }
 
-    function setTotalSupplyOnMainnet(uint newTotalSupply) external {
+    function setTotalSupplyOnMainnet(uint256 newTotalSupply) external {
         require(addressOfErc20Module == msg.sender, "Call does not go from ERC20Module");
         _totalSupplyOnMainnet = newTotalSupply;
     }
@@ -218,20 +220,20 @@ contract TokenFactory is PermissionsForSchain {
         assembly {
             nameLength := mload(add(data, 129))
         }
-        name = new string(uint(nameLength));
-        for (uint i = 0; i < uint(nameLength); i++) {
+        name = new string(uint256(nameLength));
+        for (uint256 i = 0; i < uint256(nameLength); i++) {
             bytes(name)[i] = data[129 + i];
         }
-        uint lengthOfName = uint(nameLength);
+        uint256 lengthOfName = uint256(nameLength);
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             symbolLength := mload(add(data, add(161, lengthOfName)))
         }
-        symbol = new string(uint(symbolLength));
-        for (uint i = 0; i < uint(symbolLength); i++) {
+        symbol = new string(uint256(symbolLength));
+        for (uint256 i = 0; i < uint256(symbolLength); i++) {
             bytes(symbol)[i] = data[161 + lengthOfName + i];
         }
-        uint lengthOfSymbol = uint(symbolLength);
+        uint256 lengthOfSymbol = uint256(symbolLength);
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             decimals := mload(add(data,
@@ -261,17 +263,17 @@ contract TokenFactory is PermissionsForSchain {
         assembly {
             nameLength := mload(add(data, 129))
         }
-        name = new string(uint(nameLength));
-        for (uint i = 0; i < uint(nameLength); i++) {
+        name = new string(uint256(nameLength));
+        for (uint256 i = 0; i < uint256(nameLength); i++) {
             bytes(name)[i] = data[129 + i];
         }
-        uint lengthOfName = uint(nameLength);
+        uint256 lengthOfName = uint256(nameLength);
         // solium-disable-next-line security/no-inline-assembly
         assembly {
             symbolLength := mload(add(data, add(161, lengthOfName)))
         }
-        symbol = new string(uint(symbolLength));
-        for (uint i = 0; i < uint(symbolLength); i++) {
+        symbol = new string(uint256(symbolLength));
+        for (uint256 i = 0; i < uint256(symbolLength); i++) {
             bytes(symbol)[i] = data[161 + lengthOfName + i];
         }
     }
