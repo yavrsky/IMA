@@ -22,7 +22,7 @@
 pragma solidity ^0.6.0;
 
 import "./PermissionsForMainnet.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Full.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 interface ILockAndDataERC721M {
     function erc721Tokens(uint256 index) external returns (address);
@@ -97,8 +97,8 @@ contract ERC721ModuleForMainnet is PermissionsForMainnet {
         address to,
         uint256 tokenId) internal view returns (bytes memory data)
         {
-        string memory name = IERC721Full(contractHere).name();
-        string memory symbol = IERC721Full(contractHere).symbol();
+        string memory name = IERC721(contractHere).name();
+        string memory symbol = IERC721(contractHere).symbol();
         data = abi.encodePacked(
             bytes1(uint8(5)),
             bytes32(contractPosition),

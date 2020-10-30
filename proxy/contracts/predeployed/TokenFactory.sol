@@ -23,57 +23,14 @@ pragma solidity ^0.6.0;
 
 import "./PermissionsForSchain.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Capped.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721Metadata.sol";
-import "@openzeppelin/contracts/access/Roles.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/GSN/Context.sol";
 
 
-contract MinterRole is Context {
-    using Roles for Roles.Role;
-
-    event MinterAdded(address indexed account);
-    event MinterRemoved(address indexed account);
-
-    Roles.Role private _minters;
-
-    constructor() public {
-        if (!isMinter(_msgSender())) {
-            _addMinter(_msgSender());
-        }
-    }
-
-    modifier onlyMinter() {
-        require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
-        _;
-    }
-
-    function isMinter(address account) public view returns (bool) {
-        return _minters.has(account);
-    }
-
-    function addMinter(address account) public onlyMinter {
-        _addMinter(account);
-    }
-
-    function renounceMinter() public {
-        _removeMinter(_msgSender());
-    }
-
-    function _addMinter(address account) internal {
-        _minters.add(account);
-        emit MinterAdded(account);
-    }
-
-    function _removeMinter(address account) internal {
-        _minters.remove(account);
-        emit MinterRemoved(account);
-    }
-}
-
-
-contract ERC20OnChain is ERC20Detailed, ERC20, MinterRole {
+contract ERC20OnChain is ERC20 {
 
     uint256 private _totalSupplyOnMainnet;
 
@@ -118,7 +75,7 @@ contract ERC20OnChain is ERC20Detailed, ERC20, MinterRole {
 }
 
 
-contract ERC721OnChain is ERC721Full, MinterRole {
+contract ERC721OnChain is ERC721 {
     constructor(
         string memory contractName,
         string memory contractSymbol
@@ -157,6 +114,7 @@ contract ERC721OnChain is ERC721Full, MinterRole {
 
 contract TokenFactory is PermissionsForSchain {
 
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     constructor(address _lockAndDataAddress) PermissionsForSchain(_lockAndDataAddress) public {
         // solium-disable-previous-line no-empty-blocks
@@ -181,8 +139,8 @@ contract TokenFactory is PermissionsForSchain {
             erc20ModuleAddress
         );
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
-        newERC20.addMinter(lockAndDataERC20);
-        newERC20.renounceMinter();
+        grantRole(MINTER_ROLE, lockAndDataERC20);
+        renounceRole(MINTER_ROLE, msg.sender);
         return address(newERC20);
     }
 
@@ -197,8 +155,8 @@ contract TokenFactory is PermissionsForSchain {
         ERC721OnChain newERC721 = new ERC721OnChain(name, symbol);
         address lockAndDataERC721 = IContractManagerForSchain(getLockAndDataAddress()).
             getContract("LockAndDataERC721");
-        newERC721.addMinter(lockAndDataERC721);
-        newERC721.renounceMinter();
+        grantRole(MINTER_ROLE, lockAndDataERC721);
+        renounceRole(MINTER_ROLE, msg.sender);
         return address(newERC721);
     }
 

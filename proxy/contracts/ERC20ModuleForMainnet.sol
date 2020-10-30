@@ -22,7 +22,7 @@
 pragma solidity ^0.6.0;
 
 import "./PermissionsForMainnet.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 interface ILockAndDataERC20M {
     function erc20Tokens(uint256 index) external returns (address);
@@ -52,7 +52,7 @@ contract ERC20ModuleForMainnet is PermissionsForMainnet {
         returns (bytes memory data)
     {
         address lockAndDataERC20 = IContractManagerForMainnet(lockAndDataAddress_).getContract("LockAndDataERC20");
-        uint totalSupply = ERC20Detailed(contractHere).totalSupply();
+        uint totalSupply = ERC20(contractHere).totalSupply();
         require(amount <= totalSupply, "TotalSupply is not correct");
         uint256 contractPosition = ILockAndDataERC20M(lockAndDataERC20).erc20Mapper(contractHere);
         if (contractPosition == 0) {
@@ -106,10 +106,10 @@ contract ERC20ModuleForMainnet is PermissionsForMainnet {
         view
         returns (bytes memory data)
     {
-        string memory name = ERC20Detailed(contractHere).name();
-        uint8 decimals = ERC20Detailed(contractHere).decimals();
-        string memory symbol = ERC20Detailed(contractHere).symbol();
-        uint256 totalSupply = ERC20Detailed(contractHere).totalSupply();
+        string memory name = ERC20(contractHere).name();
+        uint8 decimals = ERC20(contractHere).decimals();
+        string memory symbol = ERC20(contractHere).symbol();
+        uint256 totalSupply = ERC20(contractHere).totalSupply();
         data = abi.encodePacked(
             bytes1(uint8(3)),
             bytes32(contractPosition),
