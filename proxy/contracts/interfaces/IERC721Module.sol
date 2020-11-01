@@ -19,7 +19,8 @@
  *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.10;
+
 
 interface IERC721Module {
     function receiveERC721(

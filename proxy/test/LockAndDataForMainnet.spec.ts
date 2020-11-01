@@ -39,6 +39,10 @@ import chai = require("chai");
 chai.should();
 chai.use((chaiAsPromised as any));
 
+import { deployLockAndDataForMainnet } from "./utils/deploy/lockAndDataForMainnet";
+import { deployMessageProxyForMainnet } from "./utils/deploy/messageProxyForMainnet";
+import { deployDepositBox } from "./utils/deploy/depositBox";
+
 const MessageProxyForMainnet: MessageProxyForMainnetContract = artifacts.require("./MessageProxyForMainnet");
 const LockAndDataForMainnet: LockAndDataForMainnetContract = artifacts.require("./LockAndDataForMainnet");
 const DepositBox: DepositBoxContract = artifacts.require("./DepositBox");
@@ -49,12 +53,10 @@ contract("LockAndDataForMainnet", ([deployer, user, invoker]) => {
   let depositBox: DepositBoxInstance;
 
   beforeEach(async () => {
-    lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
-    messageProxyForMainnet = await MessageProxyForMainnet.new(
-      "Mainnet", true, lockAndDataForMainnet.address, {from: deployer});
-    lockAndDataForMainnet.setContract("MessageProxy", messageProxyForMainnet.address);
-    depositBox = await DepositBox.new(lockAndDataForMainnet.address,
-      {from: deployer});
+    lockAndDataForMainnet = await deployLockAndDataForMainnet();
+    messageProxyForMainnet = await deployMessageProxyForMainnet(
+      "Mainnet", contractManager, lockAndDataForMainnet);
+    depositBox = await deployDepositBox(lockAndDataForMainnet);
   });
 
   it("should add wei to `lockAndDataForMainnet`", async () => {
@@ -163,9 +165,7 @@ contract("LockAndDataForMainnet", ([deployer, user, invoker]) => {
       .should.be.eventually.rejectedWith(error);
   });
 
-  it("should invoke setContract without mistakes", async () => {
-    await lockAndDataForMainnet
-      .setContract("DepositBox", depositBox.address, {from: deployer});
+  it("should check contract without mistakes", async () => {
     const getMapping = await lockAndDataForMainnet.permitted(web3.utils.soliditySha3("DepositBox"));
     // expectation
     expect(getMapping).to.equal(depositBox.address);
@@ -182,19 +182,9 @@ contract("LockAndDataForMainnet", ([deployer, user, invoker]) => {
   it("should rejected with `Contract is already added` when invoke `setContract`", async () => {
     // preparation
     const error = "Contract is already added";
-    await lockAndDataForMainnet
-    .setContract("DepositBox", depositBox.address, {from: deployer});
     // execution/expectation
     await lockAndDataForMainnet
       .setContract("DepositBox", depositBox.address, {from: deployer})
-      .should.be.eventually.rejectedWith(error);
-  });
-
-  it("should rejected with `Given contract address does not contain code` when invoke `setContract`", async () => {
-    const error = "Given contract address does not contain code";
-    // execution/expectation
-    await lockAndDataForMainnet
-      .setContract("DepositBox", deployer, {from: deployer})
       .should.be.eventually.rejectedWith(error);
   });
 

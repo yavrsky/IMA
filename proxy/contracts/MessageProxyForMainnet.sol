@@ -19,10 +19,10 @@
  *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.10;
 pragma experimental ABIEncoderV2;
 
-import "./PermissionsForMainnet.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 interface ContractReceiverForMainnet {
     function postMessage(
@@ -55,7 +55,7 @@ interface ISchains {
 }
 
 
-contract MessageProxyForMainnet is PermissionsForMainnet {
+contract MessageProxyForMainnet is Initializable {
 
     // Note: this uses assembly example from
 
@@ -76,6 +76,8 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
     string public chainID;
     // Owner of this chain. For mainnet, the owner is SkaleManager
     address public owner;
+
+    address public contractManagerSkaleManager;
 
     bool blsEnabled = false;
 
@@ -132,22 +134,6 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
     mapping ( uint256 => OutgoingMessageData ) private outgoingMessageData;
     uint256 private idxHead;
     uint256 private idxTail;
-
-    /// Create a new message proxy
-
-    constructor(
-        string memory newChainID,
-        bool newBlsEnabled,
-        address newLockAndDataAddress
-    )
-        PermissionsForMainnet(newLockAndDataAddress)
-        public
-    {
-        owner = msg.sender;
-        authorizedCaller[msg.sender] = true;
-        chainID = newChainID;
-        blsEnabled = newBlsEnabled;
-    }
 
     function addAuthorizedCaller(address caller) external {
         require(msg.sender == owner, "Sender is not an owner");
@@ -296,18 +282,17 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
                 input[i].amount = messages[i].amount;
                 input[i].data = messages[i].data;
             }
-            if (blsEnabled) {
-                require(
-                    verifyMessageSignature(
-                        blsSignature,
-                        hashedArray(input),
-                        counter,
-                        hashA,
-                        hashB,
-                        srcChainID
-                    ), "Signature is not verified"
-                );
-            }
+
+            require(
+                verifyMessageSignature(
+                    sign.blsSignature,
+                    hashedArray(input),
+                    sign.counter,
+                    sign.hashA,
+                    sign.hashB,
+                    srcChainID
+                ), "Signature is not verified"
+            );
         }
 
         for (uint256 i = 0; i < messages.length; i++) {
@@ -333,6 +318,15 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
         require(msg.sender == owner, "Sender is not an owner");
         connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter = 0;
         connectedChains[keccak256(abi.encodePacked(schainName))].outgoingMessageCounter = 0;
+    }
+
+    /// Create a new message proxy
+
+    function initialize(string memory newChainID, address newContractManager) public initializer {
+        owner = msg.sender;
+        authorizedCaller[msg.sender] = true;
+        chainID = newChainID;
+        contractManagerSkaleManager = newContractManager;
     }
 
     function verifyOutgoingMessageData(
@@ -364,8 +358,6 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
         view
         returns (bool)
     {
-        address contractManagerSkaleManager = IContractManagerForMainnet(lockAndDataAddress_).getContract("ContractManagerForSkaleManager");
-        require(contractManagerSkaleManager != address(0), "Contract Manager For Skale Manager did not connect!");
         address schainsAddress = IContractManagerSkaleManager(contractManagerSkaleManager).getContract("Schains");
         return ISchains(schainsAddress).verifySchainSignature(
             blsSignature[0],

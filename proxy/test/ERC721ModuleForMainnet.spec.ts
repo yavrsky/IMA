@@ -26,14 +26,12 @@
 import { BigNumber } from "bignumber.js";
 import * as chaiAsPromised from "chai-as-promised";
 import {
-    ERC721ModuleForMainnetContract,
     ERC721ModuleForMainnetInstance,
     ERC721OnChainContract,
     ERC721OnChainInstance,
-    LockAndDataForMainnetContract,
-    LockAndDataForMainnetERC721Contract,
     LockAndDataForMainnetERC721Instance,
     LockAndDataForMainnetInstance,
+    MessageProxyForMainnetInstance,
     } from "../types/truffle-contracts";
 
 import chai = require("chai");
@@ -41,11 +39,12 @@ import chai = require("chai");
 chai.should();
 chai.use((chaiAsPromised as any));
 
-const LockAndDataForMainnet: LockAndDataForMainnetContract = artifacts.require("./LockAndDataForMainnet");
-const LockAndDataForMainnetERC721: LockAndDataForMainnetERC721Contract =
-    artifacts.require("./LockAndDataForMainnetERC721");
+import { deployLockAndDataForMainnet } from "./utils/deploy/lockAndDataForMainnet";
+import { deployLockAndDataForMainnetERC721 } from "./utils/deploy/lockAndDataForMainnetERC721";
+import { deployMessageProxyForMainnet } from "./utils/deploy/messageProxyForMainnet";
+import { deployERC721ModuleForMainnet } from "./utils/deploy/erc721ModuleForMainnet";
+
 const ERC721OnChain: ERC721OnChainContract = artifacts.require("./ERC721OnChain");
-const ERC721ModuleForMainnet: ERC721ModuleForMainnetContract = artifacts.require("./ERC721ModuleForMainnet");
 
 contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
   let lockAndDataForMainnet: LockAndDataForMainnetInstance;
@@ -54,13 +53,12 @@ contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
   let eRC721ModuleForMainnet: ERC721ModuleForMainnetInstance;
 
   beforeEach(async () => {
-    lockAndDataForMainnet = await LockAndDataForMainnet.new({from: deployer});
-    lockAndDataForMainnetERC721 =
-        await LockAndDataForMainnetERC721.new(lockAndDataForMainnet.address,
-        {from: deployer});
+    lockAndDataForMainnet = await deployLockAndDataForMainnet();
+    messageProxyForMainnet = await deployMessageProxyForMainnet(
+      "Mainnet", contractManager, lockAndDataForMainnet);
+    lockAndDataForMainnetERC721 = await deployLockAndDataForMainnetERC721(lockAndDataForMainnet);
     eRC721OnChain = await ERC721OnChain.new("ERC721OnChain", "ERC721");
-    eRC721ModuleForMainnet = await ERC721ModuleForMainnet.new(lockAndDataForMainnet.address,
-        {from: deployer});
+    eRC721ModuleForMainnet = await deployERC721ModuleForMainnet(lockAndDataForMainnet);
   });
 
   it("should invoke `receiveERC721` with `isRaw==true`", async () => {
@@ -81,11 +79,6 @@ contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
     const to = user;
     const tokenId = 1;
     const isRaw = false;
-    await lockAndDataForMainnet
-        .setContract("ERC721Module", eRC721ModuleForMainnet.address, {from: deployer});
-    // set `LockAndDataERC721` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("LockAndDataERC721", lockAndDataForMainnetERC721.address, {from: deployer});
     // execution
     const res = await eRC721ModuleForMainnet.receiveERC721.call(contractHere, to, tokenId, isRaw, {from: deployer});
     // expectation
@@ -99,12 +92,6 @@ contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
     const to0 = "0x0000000000000000000000000000000000000000"; // bytes20
     const tokenId = 10;
     const isRaw = false;
-    // set `ERC721Module` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("ERC721Module", eRC721ModuleForMainnet.address, {from: deployer});
-    // set `LockAndDataERC721` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("LockAndDataERC721", lockAndDataForMainnetERC721.address, {from: deployer});
     // mint some ERC721 of  for `deployer` address
     await eRC721OnChain.mint(deployer, tokenId, {from: deployer});
     // transfer tokenId from `deployer` to `lockAndDataForMainnetERC721`
@@ -126,12 +113,6 @@ contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
     const to0 = eRC721OnChain.address; // bytes20
     const tokenId = 10;
     const isRaw = true;
-    // set `ERC721Module` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("ERC721Module", eRC721ModuleForMainnet.address, {from: deployer});
-    // set `LockAndDataERC721` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("LockAndDataERC721", lockAndDataForMainnetERC721.address, {from: deployer});
     // mint some ERC721 of  for `deployer` address
     await eRC721OnChain.mint(deployer, tokenId, {from: deployer});
     // transfer tokenId from `deployer` to `lockAndDataForMainnetERC721`
@@ -153,12 +134,6 @@ contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
     const to0 = invoker; // bytes20
     const tokenId = 10;
     const isRaw = true;
-    // set `ERC721Module` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("ERC721Module", eRC721ModuleForMainnet.address, {from: deployer});
-    // set `LockAndDataERC721` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("LockAndDataERC721", lockAndDataForMainnetERC721.address, {from: deployer});
     // get data from `receiveERC721`
     const data = await eRC721ModuleForMainnet.receiveERC721.call(contractHere, to, tokenId, isRaw, {from: deployer});
     await eRC721ModuleForMainnet.receiveERC721(contractHere, to, tokenId, isRaw, {from: deployer});
@@ -175,12 +150,6 @@ contract("ERC721ModuleForMainnet", ([deployer, user, invoker]) => {
     const to0 = "0x0000000000000000000000000000000000000000"; // bytes20
     const tokenId = 10;
     const isRaw = false;
-    // set `ERC721Module` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("ERC721Module", eRC721ModuleForMainnet.address, {from: deployer});
-    // set `LockAndDataERC721` contract before invoke `receiveERC721`
-    await lockAndDataForMainnet
-        .setContract("LockAndDataERC721", lockAndDataForMainnetERC721.address, {from: deployer});
     // get data from `receiveERC721`
     const data = await eRC721ModuleForMainnet.receiveERC721.call(contractHere, to, tokenId, isRaw, {from: deployer});
     await eRC721ModuleForMainnet.receiveERC721(contractHere, to, tokenId, isRaw, {from: deployer});

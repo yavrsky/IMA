@@ -19,10 +19,10 @@
  *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.10;
 
 import "./PermissionsForMainnet.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol";
 
 
 contract LockAndDataForMainnetERC721 is PermissionsForMainnet {
@@ -30,11 +30,7 @@ contract LockAndDataForMainnetERC721 is PermissionsForMainnet {
     mapping(uint256 => address) public erc721Tokens;
     mapping(address => uint256) public erc721Mapper;
     // mapping(uint256 => uint256) public mintToken;
-    uint256 newIndexERC721 = 1;
-
-    constructor(address _lockAndDataAddress) PermissionsForMainnet(_lockAndDataAddress) public {
-        // solium-disable-previous-line no-empty-blocks
-    }
+    uint256 newIndexERC721;
 
     function sendERC721(address contractHere, address to, uint256 tokenId) external allow("ERC721Module") returns (bool) {
         if (IERC721(contractHere).ownerOf(tokenId) == address(this)) {
@@ -52,5 +48,10 @@ contract LockAndDataForMainnetERC721 is PermissionsForMainnet {
         erc721Mapper[addressERC721] = index;
         newIndexERC721++;
         return index;
+    }
+
+    function initialize(address newLockAndDataAddress) public override initializer {
+        PermissionsForMainnet.initialize(newLockAndDataAddress);
+        newIndexERC721 = 1;
     }
 }

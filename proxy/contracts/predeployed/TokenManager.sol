@@ -19,14 +19,14 @@
  *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.10;
 
 import "./PermissionsForSchain.sol";
 import "./../interfaces/IMessageProxy.sol";
 import "./../interfaces/IERC20Module.sol";
 import "./../interfaces/IERC721Module.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol";
 
 
 interface ILockAndDataTM {
@@ -109,9 +109,9 @@ contract TokenManager is PermissionsForSchain {
         chainID_ = newChainID;
     }
 
-    // receive() external payable {
-    //     revert("Not allowed. in TokenManager");
-    // }
+    fallback() external payable {
+        revert("Not allowed. in TokenManager");
+    }
 
     // function withdraw() external {
     //     if (msg.sender == owner) {
@@ -140,14 +140,14 @@ contract TokenManager is PermissionsForSchain {
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         address erc20Module = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
         require(
-            ERC20Detailed(contractHere).allowance(
+            ERC20UpgradeSafe(contractHere).allowance(
                 msg.sender,
                 address(this)
             ) >= amount,
             "Not allowed ERC20 Token"
         );
         require(
-            ERC20Detailed(contractHere).transferFrom(
+            ERC20UpgradeSafe(contractHere).transferFrom(
                 msg.sender,
                 lockAndDataERC20,
                 amount
@@ -182,14 +182,14 @@ contract TokenManager is PermissionsForSchain {
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         address erc20Module = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
         require(
-            ERC20Detailed(contractHere).allowance(
+            ERC20UpgradeSafe(contractHere).allowance(
                 msg.sender,
                 address(this)
             ) >= amount,
             "Not allowed ERC20 Token"
         );
         require(
-            ERC20Detailed(contractHere).transferFrom(
+            ERC20UpgradeSafe(contractHere).transferFrom(
                 msg.sender,
                 lockAndDataERC20,
                 amount
@@ -224,14 +224,14 @@ contract TokenManager is PermissionsForSchain {
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         address erc20Module = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
         require(
-            ERC20Detailed(contractHere).allowance(
+            ERC20UpgradeSafe(contractHere).allowance(
                 msg.sender,
                 address(this)
             ) >= amount,
             "Not allowed ERC20 Token"
         );
         require(
-            ERC20Detailed(contractHere).transferFrom(
+            ERC20UpgradeSafe(contractHere).transferFrom(
                 msg.sender,
                 lockAndDataERC20,
                 amount
@@ -262,14 +262,14 @@ contract TokenManager is PermissionsForSchain {
         address lockAndDataERC20 = IContractManagerForSchain(getLockAndDataAddress()).getContract("LockAndDataERC20");
         address erc20Module = IContractManagerForSchain(getLockAndDataAddress()).getContract("ERC20Module");
         require(
-            ERC20Detailed(contractHere).allowance(
+            ERC20UpgradeSafe(contractHere).allowance(
                 msg.sender,
                 address(this)
             ) >= amount,
             "Not allowed ERC20 Token"
         );
         require(
-            ERC20Detailed(contractHere).transferFrom(
+            ERC20UpgradeSafe(contractHere).transferFrom(
                 msg.sender,
                 lockAndDataERC20,
                 amount
