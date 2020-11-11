@@ -27,9 +27,9 @@ fi
 if [[ ! -z "$DOCKER_USERNAME" ]]
 then
     echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
-    docker push $IMAGE_NAME || exit $?
+    # docker push $IMAGE_NAME || exit $?
     if [ "$RELEASE" = true ]
     then
-        docker push $LATEST_IMAGE_NAME || exit $?
+        # docker push $LATEST_IMAGE_NAME || exit $?
     fi
 fi

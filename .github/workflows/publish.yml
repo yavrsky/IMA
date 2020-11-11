@@ -33,7 +33,7 @@ jobs:
         export RELEASE=true
         echo "::set-env name=RELEASE::$RELEASE"
         echo ------------ docker image
-        bash ./build_image.sh ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_PASSWORD }} #|| echo "----> Looks like deploy failed"
+        bash ./scripts/build_image.sh ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_PASSWORD }} #|| echo "----> Looks like deploy failed"
     - name: Checkout code
       uses: actions/checkout@master
     - name: Create Release
